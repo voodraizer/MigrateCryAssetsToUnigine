@@ -1,38 +1,9 @@
 import xml.etree.ElementTree as ET
 import os
 
-# CRYENGINE_ASSETS_PATH = "c:/_CRYENGINE_BUILDS/0AZ/Assets/"
-CRYENGINE_ASSETS_PATH = "c:/_CRYENGINE_BUILDS/0AZ_test/Assets/"
-UE_ASSETS_PATH = ""
-
-MODELS_XML = 'd:/Downloads/PyQt/models_list.xml'
-MATERIALS_XML = 'd:/Downloads/PyQt/materials_list.xml'
-TEXTURES_XML = 'd:/Downloads/PyQt/textures_list.xml'
+from def_globals import *
 
 
-def xml_prettify(elem):
-	"""
-	Return a pretty-printed XML string for the Element.
-	"""
-
-	from xml.etree import ElementTree
-	from xml.dom import minidom
-
-	rough_string = ElementTree.tostring(elem, 'utf-8')
-	reparsed = minidom.parseString(rough_string)
-	return reparsed.toprettyxml(indent="  ")
-
-
-def xml_get(node, attr):
-	'''
-	Get attribute from xml node.
-	Return value or ''.
-	'''
-
-	res = node.get(attr)
-
-	if (res == None): return ""
-	return res
 
 def Create_models_xml_list(root_dir):
 	# listOfFile = os.listdir(root_dir)
@@ -81,6 +52,7 @@ def Create_materials_xml_list(root_dir):
 				tex_child.set('file', tex.get("file"))
 
 	# print(xml_prettify(xml_top))
+
 	tree = ET.ElementTree(xml_root)
 	tree.write(MATERIALS_XML)
 
@@ -100,34 +72,6 @@ def Create_textures_xml_list(root_dir):
 
 	pass
 
-
-def get_filepaths(directory, type):
-	"""
-	Generate the file names in a directory 
-	tree by walking the tree either top-down or bottom-up. For each 
-	directory in the tree rooted at directory top (including top itself), 
-	it yields a 3-tuple (dirpath, dirnames, filenames).
-	"""
-	file_paths = []  # List which will store all of the full filepaths.
-
-	# Walk the tree.
-	for root, directories, files in os.walk(directory):
-		for filename in files:
-			if (type == "image" and filename.endswith(".tif")):
-				filepath = os.path.join(root, filename)
-				filepath = filepath[len(directory):]
-				file_paths.append(filepath)
-
-			if (type == "material" and filename.endswith(".mtl")):
-				filepath = os.path.join(root, filename)
-				filepath = filepath[len(directory):]
-				file_paths.append(filepath)
-			
-			if (type == "model" and filename.endswith(".fbx")):
-				pass
-
-
-	return file_paths
 
 
 def ParseCryMtlFile(xml_file):
@@ -201,7 +145,10 @@ def ParseTextures(xml_file):
 	pass
 
 
+if (not os.path.exists(os.path.dirname(TMP_EXPORT_ASSETS_PATH))):
+		os.makedirs(os.path.dirname(TMP_EXPORT_ASSETS_PATH))
+
 # ParseModels(MODELS_XML)
-# Create_models_xml_list(CRYENGINE_ASSETS_PATH)
-Create_textures_xml_list(CRYENGINE_ASSETS_PATH)
+#Create_models_xml_list(CRYENGINE_ASSETS_PATH)
 Create_materials_xml_list(CRYENGINE_ASSETS_PATH)
+Create_textures_xml_list(CRYENGINE_ASSETS_PATH)
