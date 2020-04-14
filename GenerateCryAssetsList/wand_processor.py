@@ -3,6 +3,8 @@
 import os
 # import shutil
 
+from def_globals import *
+
 from wand.image import Image
 from wand.color import Color
 
@@ -23,19 +25,16 @@ def ImageMagicConvert(img, dest_path):
 
 	original = Image(filename = img)
 	converted = original.convert('tga')
-	
 	# converted.format = 'tga'
+
+	new_filename = convert_suffixes_to_unigine(filename)
 
 	if (filename.endswith("_diff")):
 		# albedo (RGB, RGB+A)
-		base_filename = filename[:-5]
-		new_filename = base_filename + "_alb"
+		pass
 
 	if (filename.endswith("_ddna")):
 		# normalmap (RG)
-		base_filename = filename[:-5]
-		new_filename = base_filename + "_n"
-
 		converted.alpha_channel = False
 		# converted.alpha_channel = 'remove'
 

@@ -82,3 +82,32 @@ def get_filepaths(directory, type):
 
 
 	return file_paths
+
+
+def convert_suffixes_to_unigine(filename):
+	new_filename = ""
+
+	if (filename.endswith("_diff")):
+		base_filename = filename[:-5]
+		new_filename = base_filename + "_alb"
+
+	if (filename.endswith("_ddna")):
+		base_filename = filename[:-5]
+		new_filename = base_filename + "_n"
+	
+	if (filename.endswith("_spec")):
+		pass
+	
+	if (filename.endswith("_sss")):
+		pass
+
+	if (filename.endswith("_mask")):
+		pass
+	
+	if (filename.endswith("_detail")):
+		pass
+
+	if (filename.endswith("_displ")):
+		pass
+
+	return new_filename
