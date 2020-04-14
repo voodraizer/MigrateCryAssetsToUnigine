@@ -78,7 +78,9 @@ def get_filepaths(directory, type):
 				file_paths.append(filepath)
 			
 			if (type == "model" and filename.endswith(".fbx")):
-				pass
+				filepath = os.path.join(root, filename)
+				filepath = filepath[len(directory):]
+				file_paths.append(filepath)
 
 
 	return file_paths

@@ -12,11 +12,17 @@ def Create_models_xml_list(root_dir):
 	# 	if os.path.isfile(os.path.join(root_dir, entry)): print("File: ", entry)
 	# 	# print(entry)
 	
-	full_file_paths = get_filepaths(root_dir, "image")
-	for p in full_file_paths:
-		print(" > ", p)
+	xml_root = ET.Element('Models')
 
-	pass
+	full_file_paths = get_filepaths(root_dir, "model")
+	for p in full_file_paths:
+		# print(" > ", p)
+		child = ET.SubElement(xml_root, 'Model', {'path':p})
+
+	# print(xml_prettify(xml_top))
+	tree = ET.ElementTree(xml_root)
+	tree.write(MODELS_XML)
+
 
 
 def Create_materials_xml_list(root_dir):
@@ -136,9 +142,11 @@ def ParseModels(xml_file):
 			# parse materials
 			print("		", mat.get("name"), " ", mat.get("path"))
 
+
 def ParseMaterials(xml_file):
 
 	pass
+
 
 def ParseTextures(xml_file):
 
@@ -148,7 +156,10 @@ def ParseTextures(xml_file):
 if (not os.path.exists(os.path.dirname(TMP_EXPORT_ASSETS_PATH))):
 		os.makedirs(os.path.dirname(TMP_EXPORT_ASSETS_PATH))
 
+
+
+
+# Create_materials_xml_list(CRYENGINE_ASSETS_PATH)
+# Create_textures_xml_list(CRYENGINE_ASSETS_PATH)
 # ParseModels(MODELS_XML)
-#Create_models_xml_list(CRYENGINE_ASSETS_PATH)
-Create_materials_xml_list(CRYENGINE_ASSETS_PATH)
-Create_textures_xml_list(CRYENGINE_ASSETS_PATH)
+Create_models_xml_list(CRYENGINE_ASSETS_PATH)
