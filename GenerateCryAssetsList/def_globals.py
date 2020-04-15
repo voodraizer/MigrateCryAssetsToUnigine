@@ -13,16 +13,16 @@ TEXTURES_XML = TMP_EXPORT_ASSETS_PATH + 'textures_list.xml'
 #TEXTURES_CONV_TMP = 'd:/Downloads/PyQt/TMP/'
 
 # Base materials.
-MG_GENERAL = "/Game/Materials/General/MG_General"
-MG_TREES = "/Game/Materials/General/MG_Trees"
-MG_GRASS = "/Game/Materials/General/MG_Grass"
-MG_DECAL = "/Game/Materials/General/MG_Decal"
-MG_GLASS = "/Game/Materials/General/MG_Glass"
+# MG_GENERAL = "/Game/Materials/General/MG_General"
+# MG_TREES = "/Game/Materials/General/MG_Trees"
+# MG_GRASS = "/Game/Materials/General/MG_Grass"
+# MG_DECAL = "/Game/Materials/General/MG_Decal"
+# MG_GLASS = "/Game/Materials/General/MG_Glass"
 
 # Prefixes.
-PR_MI_MAT = "MI_"
-PR_MAT = "M_"
-PR_PREFAB = "PRF_"
+# PR_MI_MAT = "MI_"
+# PR_MAT = "M_"
+# PR_PREFAB = "PRF_"
 
 
 

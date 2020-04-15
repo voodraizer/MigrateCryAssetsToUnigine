@@ -6,6 +6,9 @@ from def_globals import *
 
 
 def Create_models_xml_list(root_dir):
+	'''
+	Create xml list from models.
+	'''
 	# listOfFile = os.listdir(root_dir)
 	# for entry in listOfFile:
 	# 	if os.path.isdir(os.path.join(root_dir, entry)): print("Folder: ", entry)
@@ -66,6 +69,10 @@ def Create_materials_xml_list(root_dir):
 
 
 def Create_textures_xml_list(root_dir):
+	'''
+	Create xml list from textures.
+	'''
+
 	xml_root = ET.Element('Textures')
 
 	full_file_paths = get_filepaths(root_dir, "image")
@@ -78,6 +85,21 @@ def Create_textures_xml_list(root_dir):
 
 	pass
 
+
+def Create_prefabs_xml_list(root_dir):
+	'''
+	Create xml list from prefabs.
+	'''
+
+	pass
+
+
+def Create_levels_xml_list(root_dir):
+	'''
+	Create xml list from levels.
+	'''
+
+	pass
 
 
 def ParseCryMtlFile(xml_file):
@@ -130,7 +152,11 @@ def ParseCryMtlFile(xml_file):
 	
 	return cry_mtl_obj
 
+
 def ParseModels(xml_file):
+	'''
+	
+	'''
 	tree = ET.parse(xml_file)
 	root = tree.getroot()
 
@@ -144,22 +170,17 @@ def ParseModels(xml_file):
 
 
 def ParseMaterials(xml_file):
+	'''
+	
+	'''
 
 	pass
 
 
 def ParseTextures(xml_file):
+	'''
+	
+	'''
 
 	pass
 
-
-if (not os.path.exists(os.path.dirname(TMP_EXPORT_ASSETS_PATH))):
-		os.makedirs(os.path.dirname(TMP_EXPORT_ASSETS_PATH))
-
-
-
-
-# Create_materials_xml_list(CRYENGINE_ASSETS_PATH)
-# Create_textures_xml_list(CRYENGINE_ASSETS_PATH)
-# ParseModels(MODELS_XML)
-Create_models_xml_list(CRYENGINE_ASSETS_PATH)
