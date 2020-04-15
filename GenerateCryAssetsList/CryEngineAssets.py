@@ -143,6 +143,16 @@ def ParseCryMtlFile(xml_file):
 			cry_texture["map"] = xml_get(tex, "Map")
 			cry_texture["file"] = xml_get(tex, "File")
 
+			# Check if texture not exist or dds.
+			filename, file_extension = os.path.splitext(cry_texture["file"])
+			if (file_extension == ".dds"):
+				cry_texture["file"] = filename + ".tif"
+			
+			full_texture_path = os.path.join(CRYENGINE_ASSETS_PATH, cry_texture["file"])
+			if (not os.path.exists(full_texture_path)):
+				logging.error("Texture missing: " + cry_texture["file"])
+
+			#
 			cry_material["textures"].append(cry_texture)
 		
 		# fix

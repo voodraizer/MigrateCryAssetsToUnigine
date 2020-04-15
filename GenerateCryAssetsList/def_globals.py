@@ -1,5 +1,6 @@
 
 import os
+import logging
 
 # Engines assets.
 CRYENGINE_ASSETS_PATH = "d:/___TMP_CRY_ASSETS/Assets/"		### "c:/GITs/GameSDK/Assets/Assets/"
@@ -10,6 +11,8 @@ DESTINATION_ASSETS_PATH = "d:/UNIGINE Projects/Test_1/data/"
 MODELS_XML = TMP_EXPORT_ASSETS_PATH + 'models_list.xml'
 MATERIALS_XML = TMP_EXPORT_ASSETS_PATH + 'materials_list.xml'
 TEXTURES_XML = TMP_EXPORT_ASSETS_PATH + 'textures_list.xml'
+PREFABS_XML = TMP_EXPORT_ASSETS_PATH + 'prefabs_list.xml'
+LEVELS_XML = TMP_EXPORT_ASSETS_PATH + 'levels_list.xml'
 #TEXTURES_CONV_TMP = 'd:/Downloads/PyQt/TMP/'
 
 # Base materials.
@@ -23,6 +26,11 @@ TEXTURES_XML = TMP_EXPORT_ASSETS_PATH + 'textures_list.xml'
 # PR_MI_MAT = "MI_"
 # PR_MAT = "M_"
 # PR_PREFAB = "PRF_"
+
+# Logger.
+LOG_EXPORTFROM_FILE = TMP_EXPORT_ASSETS_PATH + "export_from_log.txt"
+LOG_EXPORTTO_FILE = TMP_EXPORT_ASSETS_PATH + "export_to_log.txt"
+
 
 
 
