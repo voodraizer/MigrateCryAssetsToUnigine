@@ -12,5 +12,8 @@ logging.info("==================================== START =======================
 # =============================================================================
 ParseTexturesXmlList(TEXTURES_XML)
 ParseMaterialsXmlList(MATERIALS_XML)
-# CreateUnigineXmlMaterial("")
 ParseModelsXmlList(MODELS_XML)
+
+
+
+logging.info("==================================== END ==================================== ")

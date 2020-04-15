@@ -20,14 +20,10 @@ def ImageMagicConvert(img, dest_path):
 	from wand.color import Color
 
 	filename, file_extension = os.path.splitext(os.path.basename(img))
-	new_filename = ""
-	base_filename = ""
-
+	new_filename = convert_suffixes_to_unigine(filename)
+	
 	original = Image(filename = img)
 	converted = original.convert('tga')
-	# converted.format = 'tga'
-
-	new_filename = convert_suffixes_to_unigine(filename)
 
 	if (filename.endswith("_diff")):
 		# albedo (RGB, RGB+A)
@@ -35,17 +31,23 @@ def ImageMagicConvert(img, dest_path):
 
 	if (filename.endswith("_ddna")):
 		# normalmap (RG)
-		converted.alpha_channel = False
-		# converted.alpha_channel = 'remove'
+		converted.alpha_channel = 'off'
 
-		gloss_img = original.clone()
-		gloss_img.alpha_channel = 'extract'
-		
 		# shading (R-metalness, G-roughness, B-specular)
-		exported_file = os.path.join(dest_path, base_filename + "_sh" + ".tga")
-		converted_images.append(exported_file)
+		alpha_image = original.clone()
+		alpha_image.alpha_channel = 'extract'
+		alpha_image.convert('RGB')
 		
+		gloss_img = original.clone()
+		gloss_img.alpha_channel = 'off'
+		gloss_img.composite_channel("green", alpha_image, 'copy')
+		gloss_img.level(1, 0, 0.0, 'red') #fill red channel black
+		gloss_img.level(1, 0, 0.0, 'blue')
+
+		sh_filename = new_filename[:-5] + "_sh" + ".tga"
+		exported_file = os.path.join(dest_path, sh_filename)
 		gloss_img.save(filename = exported_file)
+		converted_images.append(exported_file)
 	
 	if (filename.endswith("_spec")):
 		pass

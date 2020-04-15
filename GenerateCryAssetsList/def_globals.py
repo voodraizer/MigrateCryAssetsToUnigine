@@ -106,18 +106,21 @@ def convert_suffixes_to_unigine(filename):
 		new_filename = base_filename + "_n"
 	
 	if (filename.endswith("_spec")):
-		pass
+		base_filename = filename[:-5]
+		new_filename = base_filename + "_s"
 	
 	if (filename.endswith("_sss")):
 		pass
 
 	if (filename.endswith("_mask")):
-		pass
+		base_filename = filename[:-5]
+		new_filename = base_filename + "_alb"
 	
 	if (filename.endswith("_detail")):
 		pass
 
 	if (filename.endswith("_displ")):
-		pass
+		base_filename = filename[:-6]
+		new_filename = base_filename + "_h"
 
 	return new_filename
