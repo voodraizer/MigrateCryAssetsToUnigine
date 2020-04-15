@@ -23,24 +23,23 @@ def ParseModelsXmlList(xml_file):
 	#textures_count = sum(1 for _ in all_textures)
 
 	# for tex in all_textures:
-	for tex in root.iter('Texture'):
+	for mod in root.iter('Model'):
 		# parse textures
-		path_xml = xml_get(tex, "path")
+		path_xml = xml_get(mod, "path")
 		path_orig = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, path_xml))
 		path_rel = os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, os.path.dirname(path_xml)))
 
 		if (not os.path.exists(path_orig)):
-			# print("====================================================")
-			# print("File not exists: " + path_orig)
-			# print("====================================================")
 			continue
 
-		#print(path_orig + " == " + path_rel)
+		# print(os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, path_xml)) + " == " + os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, path_xml)))
 
 		#
 		if not os.path.exists(path_rel):
 			os.makedirs(path_rel)
-		
+        
+		import shutil        
+		shutil.copy2(os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, path_xml)), os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, path_xml)))
 
 	pass
 
@@ -138,33 +137,43 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 			tex_file = xml_get(tex, "file")
 
 			# Convert texture path.
-			rel_path = ''
-			if (tex_file.startswith("./")):
-				tex_file = tex_file[2:]
-				rel_path = os.path.dirname(mat_file_path)
-				rel_path = rel_path.replace('\\','/')
-				# if (rel_path.startswith("models")):
-				# 	rel_path = rel_path[7:]
-				# if (rel_path.startswith("textures")):
-				# 	rel_path = rel_path[9:]
-			
 			new_filename, aaaa = os.path.splitext(os.path.basename(tex_file))
 			new_filename = convert_suffixes_to_unigine(new_filename)
 			new_filename += ".tga"
-			# print("==================================================")
-			# print(new_filename)
-			# print("==================================================")
+
+			rel_path = ''
+			if (tex_file.startswith("./")):
+				# path relative to current folder
+				tex_file = tex_file[2:]
+				rel_path = os.path.dirname(mat_file_path) + new_filename
+				rel_path = rel_path.replace('\\','/')
 				
+			if (tex_file.lower().startswith("models")):
+				# path relative to models
+				rel_path = os.path.join(os.path.dirname(mat_file_path), "Textures", new_filename).replace('\\','/')
+				pass
+			if (tex_file.lower().startswith("textures")):
+				# path relative to textures
+				rel_path = (os.path.dirname(tex_file) + "/" + new_filename).replace('\\','/')
+			
 			
 			if (tex_map == "Diffuse"):
+				# albedo
 				xml_child = ET.SubElement(xml_root, 'texture')
-				xml_child.text = os.path.join(rel_path, "Textures", new_filename)
+				xml_child.text = rel_path
 				xml_child.set('name', "albedo")
 			
 			if (tex_map == "Bumpmap"):
+				# normal map
 				xml_child = ET.SubElement(xml_root, 'texture')
-				xml_child.text = os.path.join(rel_path, "Textures", new_filename)
+				xml_child.text = rel_path
 				xml_child.set('name', "normal")
+
+				# shading
+				xml_child = ET.SubElement(xml_root, 'texture')
+				xml_child.text = "guid://5219d6ddb5dbd1520e843a369ad2b64326bb24e2"	# white texture from core/textures/common/
+				xml_child.set('name', "shading")
+				
 
 			if (tex_map == "Opacity"):
 				pass
