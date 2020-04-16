@@ -9,7 +9,7 @@ if (not os.path.exists(os.path.dirname(TMP_EXPORT_ASSETS_PATH))):
 
 
 logging.basicConfig(filename = LOG_EXPORTFROM_FILE, filemode="w", level = logging.INFO)
-logging.info("==================================== START ==================================== ")
+logging.info("==================================== START ====================================\n\n")
 
 
 # =============================================================================
@@ -25,4 +25,4 @@ Create_models_xml_list(CRYENGINE_ASSETS_PATH)
 # Create_levels_xml_list(CRYENGINE_ASSETS_PATH)
 
 
-logging.info("==================================== END ==================================== ")
+logging.info("\n\n==================================== END ====================================")

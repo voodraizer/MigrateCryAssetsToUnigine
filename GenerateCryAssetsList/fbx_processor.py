@@ -1,6 +1,7 @@
 import sys
 import os
-# sys.path.append("c:/Python/Python37/Lib/site-packages/fbxdk")
+
+from def_globals import *
 
 
 try:
@@ -13,6 +14,7 @@ except ImportError:
 		print('For example: copy ..\\..\\lib\\Python27_x64\\* C:\\Python27\\Lib\\site-packages')
 
 from fbx import *
+
 
 def TriangulateSplitAllMeshes(pScene, pManager):
 	lNode = pScene.GetRootNode()
@@ -43,12 +45,16 @@ def TriangulateSplitAllMeshes(pScene, pManager):
 					lResult = lConverter.SplitMeshPerMaterial(lTriangulatedMesh, False) 
 					#lChildNode.RemoveNodeAttribute(lTriangulatedMesh)       
 	pass
-				
+
+
 def ListAllMeshesCount(pScene):
 	print("NUMBER OF GEOMETRIES :: %i" % pScene.GetGeometryCount())
 				
 
 def Split_mesh_by_material(path, fbx_file):
+	'''
+
+	'''
 	# Prepare the FBX SDK.
 	lSdkManager, lScene = InitializeSdkObjects()
 
@@ -102,7 +108,7 @@ def Remove_fbx_collision(lScene):
 		# attr_type = child.GetNodeAttribute().GetAttributeType()
 		# if attr_type == FbxCommon.FbxNodeAttribute.eMesh:
 		node_name = lChildNode.GetName()
-		if (node_name.startswith("UCX_") or ("collision" in node_name)):
+		if (node_name.startswith("UCX_") or ("collision" in node_name) or ("proxy" in node_name)):
 			print("FOUND COLLISION in " + node_name)
 			lMesh = lChildNode.GetNodeAttribute()
 			lChildNode.RemoveNodeAttribute(lMesh)
@@ -140,13 +146,13 @@ def Convert_fbx_model_to_unigine(fbx_orig_path, fbx_exp_path):
 	
 
 	'''
-
+	
 	# Prepare the FBX SDK.
 	lSdkManager, lScene = InitializeSdkObjects()
 	lResult = LoadScene(lSdkManager, lScene, fbx_orig_path)
 
 	if not lResult:
-		print("\n\nAn error occurred while loading the scene...")
+		logging.error("\n\n\tAn error occurred while loading the scene...\n\t\t" + fbx_orig_path + "\n")
 		return
 	
 	# Find node with collision (mesh or material).
@@ -165,13 +171,14 @@ def Convert_fbx_model_to_unigine(fbx_orig_path, fbx_exp_path):
 	# lSdkManager.GetIOSettings().SetBoolProp(EXP_FBX_EMBEDDED, True) # or False if you want ASCII
 	# and use pFileFormat in the Exporter.Initialize() call.
 	SaveScene(lSdkManager, lScene, fbx_exp_path)
-		
+	
 	# Destroy all objects created by the FBX SDK.
 	lSdkManager.Destroy()
 
 
 
 #
-fbx_path = "c:/GITs/MigrateCryAssetsToUnity/GenerateCryAssetsList/__EXAMPLES/Tractor.fbx"
+fbx_orig_path = "c:/GITs/MigrateCryAssetsToUnity/GenerateCryAssetsList/__EXAMPLES/Tractor_a.fbx"
+fbx_exp_path = "c:/GITs/MigrateCryAssetsToUnity/GenerateCryAssetsList/__EXAMPLES/out.fbx"
 # Split_mesh_by_material(fbx_path, fbx_file)
-# Convert_fbx_model_to_unigine(fbx_path, fbx_file, "output.fbx")
+Convert_fbx_model_to_unigine(fbx_orig_path, fbx_exp_path)

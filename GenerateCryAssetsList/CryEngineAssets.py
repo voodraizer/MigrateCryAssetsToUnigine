@@ -15,12 +15,24 @@ def Create_models_xml_list(root_dir):
 	# 	if os.path.isfile(os.path.join(root_dir, entry)): print("File: ", entry)
 	# 	# print(entry)
 	
+	
 	xml_root = ET.Element('Models')
 
 	full_file_paths = get_filepaths(root_dir, "model")
 	for p in full_file_paths:
-		# print(" > ", p)
 		child = ET.SubElement(xml_root, 'Model', {'path':p})
+
+		# Get cryasset for model.
+		cryasset = os.path.join(root_dir, p.replace(".fbx", ".cgf.cryasset"))
+		if (not os.path.exists(cryasset)):
+			logging.error("Cryasset not found.\n\t\t" + cryasset)
+			continue
+		
+		cryasset_tree = ET.parse(cryasset)
+		dependencies_root = cryasset_tree.getroot().find(".//Dependencies")
+		for path in dependencies_root:
+			child.set("mtl_path", path.text)
+
 
 	# print(xml_prettify(xml_top))
 	tree = ET.ElementTree(xml_root)
@@ -152,7 +164,7 @@ def ParseCryMtlFile(xml_file):
 			if (cry_texture["file"].startswith("./")):
 				# path relative to current folder
 				full_texture_path = os.path.join(CRYENGINE_ASSETS_PATH, os.path.dirname(cry_mtl_obj["mtl_file"]), cry_texture["file"][2:])
-				full_texture_path = rel_path.replace('\\','/')
+				full_texture_path = full_texture_path.replace('\\','/')
 			if (not os.path.exists(full_texture_path)):
 				logging.error("Texture missing: " + cry_texture["file"])
 

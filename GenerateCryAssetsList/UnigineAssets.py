@@ -27,20 +27,19 @@ def ParseModelsXmlList(xml_file):
 	for mod in root.iter('Model'):
 		# parse textures
 		path_xml = xml_get(mod, "path")
+
 		path_orig = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, path_xml))
-		path_rel = os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, os.path.dirname(path_xml)))
+		path_rel = os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, path_xml))
 
 		if (not os.path.exists(path_orig)):
 			continue
 
-		# print(os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, path_xml)) + " == " + os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, path_xml)))
-
 		#
-		if not os.path.exists(path_rel):
-			os.makedirs(path_rel)
+		if (not os.path.exists(os.path.dirname(path_rel))):
+			os.makedirs(os.path.dirname(path_rel))
         
+		print("\n" + path_orig + "\n" + path_rel + "\n\n")
 		import shutil
-		# shutil.copy2(os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, path_xml)), os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, path_xml)))
 		shutil.copy2(path_orig, path_rel)
 
 		# Work with fbx.
@@ -199,7 +198,7 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 
 	
 
-
+	# Parameters.
 	xml_child = ET.SubElement(xml_root, 'parameter')
 	xml_child.text = "1"
 	xml_child.set('name', "metalness")
@@ -218,12 +217,15 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 	xml_child.set('expression', "0")
 
 	alpha_test = xml_get(cry_xml_root, "alpha_test")
-	# logging.info("Alpha " + alpha_test)
 	if (alpha_test != ""):
-		# alpha_test="0.17"
+		# Alpha test.
 		xml_child = ET.SubElement(xml_root, 'options')
 		xml_child.set('transparent', "1")
-		pass
+		
+		xml_child = ET.SubElement(xml_root, 'parameter')
+		xml_child.text = "1.3"
+		xml_child.set('name', "transparent")
+		xml_child.set('expression', "0")
 
 
 	# print("==================================================")
@@ -285,9 +287,6 @@ def ParseTexturesXmlList(xml_file):
 	tree = ET.parse(xml_file)
 	root = tree.getroot()
 
-	#all_textures = root.iter('Texture')
-	#textures_count = sum(1 for _ in all_textures)
-
 	# for tex in all_textures:
 	for tex in root.iter('Texture'):
 		# parse textures
@@ -296,9 +295,6 @@ def ParseTexturesXmlList(xml_file):
 		path_rel = os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, os.path.dirname(path_xml)))
 
 		if (not os.path.exists(path_orig)):
-			# print("====================================================")
-			# print("File not exists: " + path_orig)
-			# print("====================================================")
 			continue
 
 		#print(path_orig + " == " + path_rel)
