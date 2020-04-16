@@ -38,7 +38,7 @@ def ParseModelsXmlList(xml_file):
 		if (not os.path.exists(os.path.dirname(path_rel))):
 			os.makedirs(os.path.dirname(path_rel))
         
-		print("\n" + path_orig + "\n" + path_rel + "\n\n")
+		# print("\n" + path_orig + "\n" + path_rel + "\n\n")
 		import shutil
 		shutil.copy2(path_orig, path_rel)
 
@@ -174,12 +174,24 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 			if (tex_map == "Bumpmap"):
 				# normal map
 				xml_child = ET.SubElement(xml_root, 'texture')
-				xml_child.text = rel_path
+				if (os.path.exists(os.path.join(DESTINATION_ASSETS_PATH, rel_path))):
+					xml_child.text = rel_path
+				else:
+					xml_child.text = "guid://692dbb7d56d633e22551bd47f4d92cd2d498270d" # default normal
+					logging.error("\n Texture not found: " + rel_path)
 				xml_child.set('name', "normal")
 
 				# shading
 				xml_child = ET.SubElement(xml_root, 'texture')
-				xml_child.text = "guid://5219d6ddb5dbd1520e843a369ad2b64326bb24e2"	# white texture from core/textures/common/
+				shading_path = os.path.dirname(rel_path)
+				filename, file_extension = os.path.splitext(rel_path)
+				shading_path = shading_path + filename[:-2] + "_sh.tga"
+				print(shading_path)
+				if (os.path.exists(os.path.join(DESTINATION_ASSETS_PATH, shading_path))):
+					xml_child.text = shading_path
+				else:
+					xml_child.text = "guid://5219d6ddb5dbd1520e843a369ad2b64326bb24e2"	# white texture from core/textures/common/
+					logging.error("\n Texture not found: " + shading_path)
 				xml_child.set('name', "shading")
 				
 

@@ -108,9 +108,6 @@ def convert_suffixes_to_unigine(filename):
 	if (filename.endswith("_spec")):
 		base_filename = filename[:-5]
 		new_filename = base_filename + "_s"
-	
-	if (filename.endswith("_sss")):
-		pass
 
 	if (filename.endswith("_mask")):
 		base_filename = filename[:-5]
@@ -118,6 +115,10 @@ def convert_suffixes_to_unigine(filename):
 	
 	if (filename.endswith("_detail")):
 		pass
+	
+	if (filename.endswith("_sss")):
+		base_filename = filename[:-4]
+		new_filename = base_filename + "_sss"
 
 	if (filename.endswith("_displ")):
 		base_filename = filename[:-6]
