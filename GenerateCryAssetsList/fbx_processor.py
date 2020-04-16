@@ -99,6 +99,8 @@ def Remove_fbx_collision(lScene):
 				lChildNode.RemoveMaterial(material)
 				pass
 		
+		# attr_type = child.GetNodeAttribute().GetAttributeType()
+		# if attr_type == FbxCommon.FbxNodeAttribute.eMesh:
 		node_name = lChildNode.GetName()
 		if (node_name.startswith("UCX_") or ("collision" in node_name)):
 			print("FOUND COLLISION in " + node_name)
@@ -133,7 +135,7 @@ def Rename_fbx_materials(lScene):
 				# print("MESH POLYGONS :: %i" % lMesh.GetPolygonCount())
 
 
-def Test_fbx_1(path, fbx_file):
+def Convert_fbx_model_to_unigine(fbx_orig_path, fbx_exp_path):
 	'''
 	
 
@@ -141,7 +143,7 @@ def Test_fbx_1(path, fbx_file):
 
 	# Prepare the FBX SDK.
 	lSdkManager, lScene = InitializeSdkObjects()
-	lResult = LoadScene(lSdkManager, lScene, os.path.join(path, fbx_file))
+	lResult = LoadScene(lSdkManager, lScene, fbx_orig_path)
 
 	if not lResult:
 		print("\n\nAn error occurred while loading the scene...")
@@ -158,7 +160,11 @@ def Test_fbx_1(path, fbx_file):
 	
 	# Save fbx.
 	# TODO: save as binary
-	SaveScene(lSdkManager, lScene, os.path.join(path, "output.fbx"))
+	# lSdkManager.GetIOSettings().SetBoolProp(EXP_FBX_MATERIAL, True)
+	# lSdkManager.GetIOSettings().SetBoolProp(EXP_FBX_TEXTURE, True)
+	# lSdkManager.GetIOSettings().SetBoolProp(EXP_FBX_EMBEDDED, True) # or False if you want ASCII
+	# and use pFileFormat in the Exporter.Initialize() call.
+	SaveScene(lSdkManager, lScene, fbx_exp_path)
 		
 	# Destroy all objects created by the FBX SDK.
 	lSdkManager.Destroy()
@@ -166,7 +172,6 @@ def Test_fbx_1(path, fbx_file):
 
 
 #
-fbx_path = "c:/GITs/MigrateCryAssetsToUnity/GenerateCryAssetsList/__EXAMPLES"
-fbx_file = "Tractor.fbx"
+fbx_path = "c:/GITs/MigrateCryAssetsToUnity/GenerateCryAssetsList/__EXAMPLES/Tractor.fbx"
 # Split_mesh_by_material(fbx_path, fbx_file)
-Test_fbx_1(fbx_path, fbx_file)
+# Convert_fbx_model_to_unigine(fbx_path, fbx_file, "output.fbx")

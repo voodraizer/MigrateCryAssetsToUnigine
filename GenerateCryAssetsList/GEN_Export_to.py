@@ -12,7 +12,7 @@ logging.info("==================================== START =======================
 # =============================================================================
 # ParseTexturesXmlList(TEXTURES_XML)
 ParseMaterialsXmlList(MATERIALS_XML)
-ParseModelsXmlList(MODELS_XML)
+# ParseModelsXmlList(MODELS_XML)
 
 
 

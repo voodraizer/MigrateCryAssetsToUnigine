@@ -4,6 +4,7 @@ import os
 
 from def_globals import *
 from wand_processor import *
+from fbx_processor import *
 
 
 
@@ -38,8 +39,12 @@ def ParseModelsXmlList(xml_file):
 		if not os.path.exists(path_rel):
 			os.makedirs(path_rel)
         
-		import shutil        
-		shutil.copy2(os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, path_xml)), os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, path_xml)))
+		import shutil
+		# shutil.copy2(os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, path_xml)), os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, path_xml)))
+		shutil.copy2(path_orig, path_rel)
+
+		# Work with fbx.
+		Convert_fbx_model_to_unigine(path_rel, path_rel)
 
 	pass
 
@@ -142,10 +147,14 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 			new_filename += ".tga"
 
 			rel_path = ''
+			# if (tex_file.startswith("./")):
+			# 	# path relative to current folder
+			# 	tex_file = tex_file[2:]
+			# 	rel_path = os.path.dirname(mat_file_path) + new_filename
+			# 	rel_path = rel_path.replace('\\','/')
 			if (tex_file.startswith("./")):
 				# path relative to current folder
-				tex_file = tex_file[2:]
-				rel_path = os.path.dirname(mat_file_path) + new_filename
+				rel_path = os.path.join(os.path.dirname(mat_file_path), os.path.dirname(tex_file[2:]), new_filename)
 				rel_path = rel_path.replace('\\','/')
 				
 			if (tex_file.lower().startswith("models")):
@@ -207,6 +216,14 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 	xml_child.text = "1"
 	xml_child.set('name', "gloss")
 	xml_child.set('expression', "0")
+
+	alpha_test = xml_get(cry_xml_root, "alpha_test")
+	# logging.info("Alpha " + alpha_test)
+	if (alpha_test != ""):
+		# alpha_test="0.17"
+		xml_child = ET.SubElement(xml_root, 'options')
+		xml_child.set('transparent', "1")
+		pass
 
 
 	# print("==================================================")
