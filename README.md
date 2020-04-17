@@ -14,7 +14,12 @@ Python 3.3
 
 ### Wand
 Для работы с текстурами используется библиотека [Wand](https://github.com/emcconville/wand/).  
-Краткое описание и установку можно почитать в [ОфДоках](http://docs.wand-py.org/en/0.5.9/).
+Краткое описание и установку можно почитать в [ОфДоках](http://docs.wand-py.org/en/0.5.9/).    
+
+### Pillow
+Для работы с текстурами используется библиотека [Pillow](https://python-pillow.org/).   
+Краткое описание и установку можно почитать в [ОфДоках](https://pillow.readthedocs.io/en/stable/installation.html).    
+
 
 
 ```
