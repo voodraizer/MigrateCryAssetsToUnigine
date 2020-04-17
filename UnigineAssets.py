@@ -3,8 +3,7 @@ import os
 # import shutil
 
 from def_globals import *
-from wand_processor import *
-from fbx_processor import *
+# from fbx_processor import *
 
 
 
@@ -43,7 +42,7 @@ def ParseModelsXmlList(xml_file):
 		shutil.copy2(path_orig, path_rel)
 
 		# Work with fbx.
-		Convert_fbx_model_to_unigine(path_rel, path_rel)
+		# Convert_fbx_model_to_unigine(path_rel, path_rel)
 
 	pass
 
@@ -263,6 +262,9 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 	Convert and copy all textures (tif, dds) from materials_xml.
 	'''
 
+	# from wand_processor import ImageConvert
+	from pillow_processor import ImageConvert
+
 	# Collect all dds and tif paths in project.
 	ALL_TEXTURES = []
 	ALL_TEXTURES = get_filepaths(CRYENGINE_ASSETS_PATH, "image")
@@ -285,7 +287,7 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 		if not os.path.exists(path_rel): os.makedirs(path_rel)
 		
 		# imagemagic convert
-		ImageMagicConvert(path_orig, path_rel)
+		ImageConvert(path_orig, path_rel)
 		exported_textures.append(os.path.normpath(path_orig.lower()))
 	
 
@@ -312,12 +314,12 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 			if (tex_map == "Diffuse"):
 				# albedo
 				if (os.path.exists(full_path)):
-					ImageMagicConvert(full_path, path_rel)
+					ImageConvert(full_path, path_rel)
 					exported_textures.append(os.path.normpath(full_path.lower()))
 				else:
 					full_path = Search_texture_file(ALL_TEXTURES, full_path)
 					if (full_path != ""):
-						ImageMagicConvert(full_path, path_rel)
+						ImageConvert(full_path, path_rel)
 						exported_textures.append(os.path.normpath(full_path.lower()))
 					
 					

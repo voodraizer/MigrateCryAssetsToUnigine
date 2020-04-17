@@ -89,6 +89,15 @@ def Create_textures_xml_list(root_dir):
 
 	full_file_paths = get_filepaths(root_dir, "image")
 	for p in full_file_paths:
+		
+		import re
+		path = p.lower()
+		re.split('. |\\|/', path)
+		
+		# Collect only tif files in models and textures folders.
+		if (".dds" in path): continue
+		if ((not "models" in path) and (not "textures" in path)): continue
+
 		child = ET.SubElement(xml_root, 'Texture', {'path':p})
 
 	# print(xml_prettify(xml_top))
