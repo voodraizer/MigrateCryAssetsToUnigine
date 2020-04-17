@@ -104,6 +104,11 @@ def ParseCryMtlFile(xml_file):
 
 
 def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
+	'''
+	Create unigine material and link existing textures.
+
+	'''
+
 	import uuid
 	import hashlib
 
@@ -137,76 +142,38 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 
 	# parse textures.
 	for tex in cry_xml_root.iter('Texture'):
-			tex_map = xml_get(tex, "map")
-			tex_file = xml_get(tex, "file")
+		tex_map = xml_get(tex, "map")
+		tex_file = xml_get(tex, "file")
 
-			# Convert texture path.
-			new_filename, aaaa = os.path.splitext(os.path.basename(tex_file))
-			new_filename = convert_suffixes_to_unigine(new_filename)
-			new_filename += ".tga"
+		# ===============================================================================================================================
+		rel_path = Convert_mtl_texture_path(tex_file)
 
-			rel_path = ''
-			# if (tex_file.startswith("./")):
-			# 	# path relative to current folder
-			# 	tex_file = tex_file[2:]
-			# 	rel_path = os.path.dirname(mat_file_path) + new_filename
-			# 	rel_path = rel_path.replace('\\','/')
-			if (tex_file.startswith("./")):
-				# path relative to current folder
-				rel_path = os.path.join(os.path.dirname(mat_file_path), os.path.dirname(tex_file[2:]), new_filename)
-				rel_path = rel_path.replace('\\','/')
-				
-			if (tex_file.lower().startswith("models")):
-				# path relative to models
-				rel_path = os.path.join(os.path.dirname(mat_file_path), "Textures", new_filename).replace('\\','/')
-				pass
-			if (tex_file.lower().startswith("textures")):
-				# path relative to textures
-				rel_path = (os.path.dirname(tex_file) + "/" + new_filename).replace('\\','/')
+		xml_child = ET.SubElement(xml_root, 'texture')
+		xml_child.text = rel_path
+
+		if (tex_map == "Diffuse"):
+			# albedo
+			xml_child.set('name', "albedo")
 			
-			
-			if (tex_map == "Diffuse"):
-				# albedo
-				xml_child = ET.SubElement(xml_root, 'texture')
-				xml_child.text = rel_path
-				xml_child.set('name', "albedo")
-			
-			if (tex_map == "Bumpmap"):
-				# normal map
-				xml_child = ET.SubElement(xml_root, 'texture')
-				if (os.path.exists(os.path.join(DESTINATION_ASSETS_PATH, rel_path))):
-					xml_child.text = rel_path
-				else:
-					xml_child.text = "guid://692dbb7d56d633e22551bd47f4d92cd2d498270d" # default normal
-					logging.error("\n Texture not found: " + rel_path)
-				xml_child.set('name', "normal")
+		if (tex_map == "Bumpmap"):
+			# normal map
+			xml_child.set('name', "normal")
+			# xml_child.text = "guid://692dbb7d56d633e22551bd47f4d92cd2d498270d" # default normal
 
-				# shading
-				xml_child = ET.SubElement(xml_root, 'texture')
-				shading_path = os.path.dirname(rel_path)
-				filename, file_extension = os.path.splitext(rel_path)
-				shading_path = shading_path + filename[:-2] + "_sh.tga"
-				print(shading_path)
-				if (os.path.exists(os.path.join(DESTINATION_ASSETS_PATH, shading_path))):
-					xml_child.text = shading_path
-				else:
-					xml_child.text = "guid://5219d6ddb5dbd1520e843a369ad2b64326bb24e2"	# white texture from core/textures/common/
-					logging.error("\n Texture not found: " + shading_path)
-				xml_child.set('name', "shading")
-				
+			# shading
+			xml_child = ET.SubElement(xml_root, 'texture')
+			shading_path = os.path.dirname(rel_path)
+			filename, file_extension = os.path.splitext(rel_path)
+			shading_path = shading_path + filename[:-2] + "_sh.tga"
+			if (os.path.exists(os.path.join(DESTINATION_ASSETS_PATH, shading_path))):
+				xml_child.text = shading_path
+			else:
+				xml_child.text = "guid://5219d6ddb5dbd1520e843a369ad2b64326bb24e2"	# white texture from core/textures/common/
+				logging.error("\n Texture not found: " + shading_path)
+			xml_child.set('name', "shading")
 
-			if (tex_map == "Opacity"):
-				pass
-			
-			if (tex_map == "Detail"):
-				pass
-
-			if (tex_map == "Custom"):
-				pass
-			
-			if (tex_map == "[1] Custom"):
-				pass
-
+		
+		
 
 	
 
@@ -290,33 +257,110 @@ def ParseMaterialsXmlList(xml_file):
 # Textures.
 # =============================================================================
 
-def ParseTexturesXmlList(xml_file):
+def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 	'''
-	
+	Convert and copy all tif textures from textures_xml.
+	Convert and copy all textures (tif, dds) from materials_xml.
 	'''
-	# print("XML file: " + xml_file)
 
-	tree = ET.parse(xml_file)
+	# Collect all dds and tif paths in project.
+	ALL_TEXTURES = []
+	ALL_TEXTURES = get_filepaths(CRYENGINE_ASSETS_PATH, "image")
+
+	exported_textures = []
+
+
+	# parse textures_xml file.
+	tree = ET.parse(xml_tex_file)
 	root = tree.getroot()
 
-	# for tex in all_textures:
 	for tex in root.iter('Texture'):
 		# parse textures
 		path_xml = xml_get(tex, "path")
 		path_orig = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, path_xml))
 		path_rel = os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, os.path.dirname(path_xml)))
 
-		if (not os.path.exists(path_orig)):
-			continue
-
-		#print(path_orig + " == " + path_rel)
-
-		#
-		if not os.path.exists(path_rel):
-			os.makedirs(path_rel)
+		if (not os.path.exists(path_orig)): continue
+		
+		if not os.path.exists(path_rel): os.makedirs(path_rel)
 		
 		# imagemagic convert
-		converted_images = ImageMagicConvert(path_orig, path_rel)
+		ImageMagicConvert(path_orig, path_rel)
+		exported_textures.append(os.path.normpath(path_orig.lower()))
+	
+
+	# parse materials_xml file.
+	tree = ET.parse(xml_mat_file)
+	root = tree.getroot()
+
+	for mat in root.iter('Material'):
+		mat_file_path = xml_get(mat, "mtl_file")
+
+		for tex in mat.iter('Texture'):
+			# parse textures.
+			tex_map = xml_get(tex, "map")
+			tex_file = xml_get(tex, "file")
+
+			rel_path = Mtl_texture_path_to_relative(tex_file, mat_file_path)
+			full_path = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, rel_path))
+			# logging.info("\nTexture: " + tex_file)
+
+			if (os.path.normpath(full_path.lower()) in exported_textures):
+				# texture already convered
+				continue
+			
+			if (tex_map == "Diffuse"):
+				# albedo
+				if (os.path.exists(full_path)):
+					ImageMagicConvert(full_path, path_rel)
+					exported_textures.append(os.path.normpath(full_path.lower()))
+				else:
+					full_path = Search_texture_file(ALL_TEXTURES, full_path)
+					if (full_path != ""):
+						ImageMagicConvert(full_path, path_rel)
+						exported_textures.append(os.path.normpath(full_path.lower()))
+					
+					
+			
+			# if (tex_map == "Bumpmap"):
+			# 	# normal map
+			# 	if (os.path.exists(full_path)):
+			# 		# imagemagic convert
+			# 		ImageMagicConvert(path_orig, path_rel)
+			# 	else:
+			# 		# logging.error("\n Texture not found: " + rel_path)
+			# 		pass
+
+			# 	# shading
+			# 	shading_path = os.path.dirname(rel_path)
+			# 	filename, file_extension = os.path.splitext(rel_path)
+			# 	shading_path = shading_path + filename[:-2] + "_sh.tga"
+
+			# 	if (os.path.exists(os.path.join(DESTINATION_ASSETS_PATH, shading_path))):
+			# 		# imagemagic convert
+			# 		ImageMagicConvert(path_orig, path_rel)
+			# 	else:
+			# 		# logging.error("\n Texture not found: " + shading_path)
+			# 		pass
+				
+
+			# if (tex_map == "Opacity"):
+			# 	pass
+			
+			# if (tex_map == "Detail"):
+			# 	pass
+
+			# if (tex_map == "Custom"):
+			# 	pass
+			
+			# if (tex_map == "[1] Custom"):
+			# 	pass
+
+			
+	
+	# converted textures info
+	logging.info("\n\n\n\tTexture convert done !!! \n\tTextures: " + str(len(exported_textures)) + "\n\n")
+	
 
 	pass
 

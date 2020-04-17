@@ -31,7 +31,8 @@ LEVELS_XML = TMP_EXPORT_ASSETS_PATH + 'levels_list.xml'
 LOG_EXPORTFROM_FILE = TMP_EXPORT_ASSETS_PATH + "export_from_log.txt"
 LOG_EXPORTTO_FILE = TMP_EXPORT_ASSETS_PATH + "export_to_log.txt"
 
-
+# DEBUG
+DEBUG_DISABLE_WAND = True
 
 
 
@@ -75,7 +76,7 @@ def get_filepaths(directory, type):
 	# Walk the tree.
 	for root, directories, files in os.walk(directory):
 		for filename in files:
-			if (type == "image" and filename.endswith(".tif")):
+			if (type == "image" and (filename.endswith(".tif") or filename.endswith(".dds"))):
 				filepath = os.path.join(root, filename)
 				filepath = filepath[len(directory):]
 				file_paths.append(filepath)
@@ -125,3 +126,96 @@ def convert_suffixes_to_unigine(filename):
 		new_filename = base_filename + "_h"
 
 	return new_filename
+
+
+def Mtl_texture_path_to_relative_unigine(tex_file, mat_file_path):
+	'''
+
+	'''
+
+	# Convert texture path.
+	new_filename, aaaa = os.path.splitext(os.path.basename(tex_file))
+	new_filename = convert_suffixes_to_unigine(new_filename)
+	new_filename += ".tga"
+
+	rel_path = ''
+	# if (tex_file.startswith("./")):
+	# 	# path relative to current folder
+	# 	tex_file = tex_file[2:]
+	# 	rel_path = os.path.dirname(mat_file_path) + new_filename
+	# 	rel_path = rel_path.replace('\\','/')
+	if (tex_file.startswith("./")):
+		# path relative to current folder
+		rel_path = os.path.join(os.path.dirname(mat_file_path), os.path.dirname(tex_file[2:]), new_filename)
+		rel_path = rel_path.replace('\\','/')
+		
+	if (tex_file.lower().startswith("models")):
+		# path relative to models
+		rel_path = os.path.join(os.path.dirname(mat_file_path), "Textures", new_filename).replace('\\','/')
+		pass
+	if (tex_file.lower().startswith("textures")):
+		# path relative to textures
+		rel_path = (os.path.dirname(tex_file) + "/" + new_filename).replace('\\','/')
+	
+	return rel_path
+
+def Mtl_texture_path_to_relative(tex_file, mat_file_path):
+	'''
+
+	'''
+
+	# Convert texture path.
+	file_name, file_ext = os.path.splitext(os.path.basename(tex_file))
+
+	rel_path = ''
+	
+	if (tex_file.startswith("./")):
+		# path relative to current folder
+		rel_path = os.path.join(os.path.dirname(mat_file_path), os.path.dirname(tex_file[2:]), file_name)
+		
+	if (tex_file.lower().startswith("models")):
+		# path relative to models
+		rel_path = os.path.join(os.path.dirname(mat_file_path), "Textures", file_name).replace('\\','/')
+		
+	if (tex_file.lower().startswith("textures")):
+		# path relative to textures
+		rel_path = (os.path.dirname(tex_file) + "/" + file_name).replace('\\','/')
+
+	if (tex_file.lower().startswith("objects")):
+		# path relative to objects
+		rel_path = tex_file
+	
+	rel_path = rel_path.replace('\\','/')
+
+	if (rel_path == ""): logging.error("\nWrong path convert: " + tex_file + "\nResult: " + rel_path)
+
+	return rel_path + file_ext
+
+
+def Search_texture_file(ALL_TEXTURES, full_path):
+	'''
+	1. search original tif file from full_path.
+	2. search the same dds.
+	3. search along all texture file in project.
+	'''
+
+	file_name, file_ext = os.path.splitext(os.path.basename(full_path.lower()))
+
+	found_files = []
+
+	for p in ALL_TEXTURES:
+		f, e = os.path.splitext(os.path.basename(p.lower()))
+		if (file_name == f): found_files.append(p)
+	
+	for p in found_files:
+		f, e = os.path.splitext(os.path.basename(p.lower()))
+		if (e == ".tif"): return os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, p))
+	
+	for p in found_files:
+		f, e = os.path.splitext(os.path.basename(p.lower()))
+		if (e == ".dds"): return os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, p))
+
+	logging.error("\nTexture not found (tif and dds): " + full_path)
+
+	return ""
+

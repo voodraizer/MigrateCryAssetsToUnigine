@@ -7,7 +7,7 @@ from def_globals import *
 
 def Create_models_xml_list(root_dir):
 	'''
-	Create xml list from models.
+	Create xml list from all models (fbx).
 	'''
 	# listOfFile = os.listdir(root_dir)
 	# for entry in listOfFile:
@@ -42,7 +42,7 @@ def Create_models_xml_list(root_dir):
 
 def Create_materials_xml_list(root_dir):
 	'''
-	Create xml list from materials.
+	Create xml list from materials (mtl).
 	'''
 
 	xml_root = ET.Element('Materials')
@@ -82,7 +82,7 @@ def Create_materials_xml_list(root_dir):
 
 def Create_textures_xml_list(root_dir):
 	'''
-	Create xml list from textures.
+	Create xml list from textures (tif).
 	'''
 
 	xml_root = ET.Element('Textures')
@@ -193,20 +193,3 @@ def ParseModels(xml_file):
 		for mat in model.iter('Material'):
 			# parse materials
 			print("		", mat.get("name"), " ", mat.get("path"))
-
-
-def ParseMaterials(xml_file):
-	'''
-	
-	'''
-
-	pass
-
-
-def ParseTextures(xml_file):
-	'''
-	
-	'''
-
-	pass
-

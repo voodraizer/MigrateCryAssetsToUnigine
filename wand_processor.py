@@ -1,7 +1,5 @@
 
-# import xml.etree.ElementTree as ET
 import os
-# import shutil
 
 from def_globals import *
 
@@ -14,7 +12,7 @@ def ImageMagicConvert(img, dest_path):
 
 	'''
 
-	converted_images = []
+	if (DEBUG_DISABLE_WAND): return	# Debug disable.
 
 	from wand.image import Image
 	from wand.color import Color
@@ -47,7 +45,6 @@ def ImageMagicConvert(img, dest_path):
 		sh_filename = new_filename[:-5] + "_sh" + ".tga"
 		exported_file = os.path.join(dest_path, sh_filename)
 		gloss_img.save(filename = exported_file)
-		converted_images.append(exported_file)
 	
 	if (filename.endswith("_spec")):
 		pass
@@ -65,14 +62,13 @@ def ImageMagicConvert(img, dest_path):
 		pass
 
 	exported_file = os.path.join(dest_path, new_filename + ".tga")
-	converted_images.append(exported_file)
 
 	# print(new_filename + ".tga")
 	# print(exported_file)
 
 	converted.save(filename = exported_file)
 
-	return converted_images
+	pass
 
 
 def ImageMagicConvertBySet(imgs, dest_path):
