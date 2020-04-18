@@ -1,6 +1,6 @@
 
 import os
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 from def_globals import *
 
@@ -13,14 +13,17 @@ def ImageConvert(img, dest_path):
 	'''
 
 	if (DEBUG_DISABLE_IMAGE_CONV): return	# Debug disable.
-	
+
+	if (not os.path.isfile(img)):
+		logging.error("\n\t\t\tPillow not found texture: " + img + "\n")
+		return
 
 	filename, file_extension = os.path.splitext(os.path.basename(img))
 	new_filename = convert_suffixes_to_unigine(filename)
 	
 	try:
 		original = Image.open(img)
-		# print("Format: " + original.format + " Mode:" + original.mode)
+		
 
 		black = Image.new('RGB', original.size, (0, 0, 0)).convert('L')		
 		
@@ -92,9 +95,12 @@ def ImageConvert(img, dest_path):
 				converted = Image.merge('RGB', (a, a, a))
 				converted.save(exported_file, compression = 'tga_rle')
 			pass
-
+	
+	except UnidentifiedImageError as e:
+		original = None
 	except Exception as e:
-		logging.error("\nPillow exception on texture: " + img + "\n" + str(e) + "\nFormat: " + original.format + " Mode:" + original.mode + "\n")
+		if (original):
+			logging.error("\n\t\t\tPillow exception on texture: " + img + "\n\t\t\t" + str(e) + "\n\t\t\tFormat: " + original.format + " Mode:" + original.mode + "\n")
 	
 	pass
 

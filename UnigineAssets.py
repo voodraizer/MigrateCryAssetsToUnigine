@@ -303,21 +303,19 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 			# parse textures.
 			tex_map = xml_get(tex, "map")
 			tex_file = xml_get(tex, "file")
-
-			# rel_path = Mtl_texture_path_to_relative(tex_file, mat_file_path)
-			# full_path = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, rel_path))
-			# logging.info("\nTexture: " + tex_file)
+			
 			full_path = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, tex_file))
 
 			if (os.path.normpath(full_path.lower()) in exported_textures):
 				# texture already convered.
 				continue
 
-			if (tex_file != "" and os.path.exists(full_path)):
+			if (os.path.isfile(full_path)):
 				ImageConvert(full_path, path_rel)
 				exported_textures.append(os.path.normpath(full_path.lower()))
 			else:
-				logging.error("\n\t\t\tTexture missing: " + full_path + "\n\t\t\t")
+				logging.error("\n\t\t\tTexture missing: " + full_path + "\n\t\t\t" + xml_get(tex, "file_orig") +"\n\t\t\t")
+				continue
 
 			
 	
