@@ -60,10 +60,7 @@ def ImageConvert(img, dest_path):
 				gloss_img = Image.merge('RGB', (black, a, spec_img))
 			else:
 				gloss_img = Image.merge('RGB', (black, a, black))
-
-			# sh_filename = new_filename[:-5] + "_sh" + ".tga"
-			# sh_filename = convert_suffixes_to_unigine(new_filename.replace("_n", "_sh"))
-			# exported_file = os.path.join(dest_path, sh_filename)
+			
 			exported_file = exported_file.replace("_n", "_sh")
 			gloss_img.save(exported_file, compression = 'tga_rle')
 			pass

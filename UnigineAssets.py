@@ -309,7 +309,11 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 			# logging.info("\nTexture: " + tex_file)
 
 			if (os.path.normpath(full_path.lower()) in exported_textures):
-				# texture already convered
+				# texture already convered.
+				continue
+
+			if (Search_texture_file_by_name(exported_textures, full_path)):
+				# texture already convered in other colation.
 				continue
 
 			if (os.path.exists(full_path)):
@@ -317,7 +321,7 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 				exported_textures.append(os.path.normpath(full_path.lower()))
 			else:
 				full_path = Search_texture_file(ALL_TEXTURES, full_path)
-				if (full_path != ""):
+				if (full_path != ""):# and not Search_texture_file_by_name(exported_textures, full_path)):
 					ImageConvert(full_path, path_rel)
 					exported_textures.append(os.path.normpath(full_path.lower()))
 

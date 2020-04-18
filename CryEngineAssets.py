@@ -170,12 +170,19 @@ def ParseCryMtlFile(xml_file):
 				cry_texture["file"] = filename + ".tif"
 			
 			full_texture_path = os.path.join(CRYENGINE_ASSETS_PATH, cry_texture["file"])
+
 			if (cry_texture["file"].startswith("./")):
 				# path relative to current folder
 				full_texture_path = os.path.join(CRYENGINE_ASSETS_PATH, os.path.dirname(cry_mtl_obj["mtl_file"]), cry_texture["file"][2:])
 				full_texture_path = full_texture_path.replace('\\','/')
+			else:
+				# try search texture.
+				# rel_path = Searach_texture(CRYENGINE_ASSETS_PATH, cry_texture["file"])
+				# full_texture_path = os.path.join(CRYENGINE_ASSETS_PATH, rel_path).replace('\\','/')
+				pass
+			
 			if (not os.path.exists(full_texture_path)):
-				logging.error("Texture missing: " + cry_texture["file"])
+				logging.error("\nMaterial texture missing: " + cry_texture["file"] + "\n" + full_texture_path)
 
 			#
 			cry_material["textures"].append(cry_texture)

@@ -3,9 +3,9 @@ import os
 import logging
 
 # Engines assets.
-CRYENGINE_ASSETS_PATH = "d:/___TMP_CRY_ASSETS/Assets/"		### "c:/GITs/GameSDK/Assets/Assets/"
+CRYENGINE_ASSETS_PATH = "d:/CRY_MIGRATE/Assets/" ### "d:/___TMP_CRY_ASSETS/Assets/"
 TMP_EXPORT_ASSETS_PATH = "D:/___TMP_UNIGINE_EXPORT/"
-DESTINATION_ASSETS_PATH = "d:/UNIGINE Projects/Test_1/data/"
+DESTINATION_ASSETS_PATH = "d:/UNIGINE Projects/UNIGINE_MIGRATE_FROM_CRY/data/" ### "d:/UNIGINE Projects/Test_1/data/"
 
 # Exported xml.
 MODELS_XML = TMP_EXPORT_ASSETS_PATH + 'models_list.xml'
@@ -31,7 +31,7 @@ LOG_EXPORTFROM_FILE = TMP_EXPORT_ASSETS_PATH + "export_from_log.txt"
 LOG_EXPORTTO_FILE = TMP_EXPORT_ASSETS_PATH + "export_to_log.txt"
 
 # DEBUG
-DEBUG_DISABLE_IMAGE_CONV = False
+DEBUG_DISABLE_IMAGE_CONV = True
 
 
 
@@ -165,18 +165,18 @@ def Mtl_texture_path_to_relative(tex_file, mat_file_path):
 	file_name, file_ext = os.path.splitext(os.path.basename(tex_file))
 
 	rel_path = ''
-	
+		
 	if (tex_file.startswith("./")):
 		# path relative to current folder
-		rel_path = os.path.join(os.path.dirname(mat_file_path), os.path.dirname(tex_file[2:]), file_name)
+		rel_path = os.path.join(os.path.dirname(mat_file_path), os.path.dirname(tex_file[2:]), file_name) + file_ext
 		
 	if (tex_file.lower().startswith("models")):
 		# path relative to models
-		rel_path = os.path.join(os.path.dirname(mat_file_path), "Textures", file_name).replace('\\','/')
+		rel_path = os.path.join(os.path.dirname(mat_file_path), "Textures", file_name).replace('\\','/') + file_ext
 		
 	if (tex_file.lower().startswith("textures")):
 		# path relative to textures
-		rel_path = (os.path.dirname(tex_file) + "/" + file_name).replace('\\','/')
+		rel_path = (os.path.dirname(tex_file) + "/" + file_name).replace('\\','/') + file_ext
 
 	if (tex_file.lower().startswith("objects")):
 		# path relative to objects
@@ -186,14 +186,14 @@ def Mtl_texture_path_to_relative(tex_file, mat_file_path):
 
 	if (rel_path == ""): logging.error("\nWrong path convert: " + tex_file + "\nResult: " + rel_path)
 
-	return rel_path + file_ext
+	return rel_path
 
 
 def Search_texture_file(ALL_TEXTURES, full_path):
 	'''
 	1. search original tif file from full_path.
 	2. search the same dds.
-	3. search along all texture file in project.
+	3. search along all texture files in project.
 	'''
 
 	file_name, file_ext = os.path.splitext(os.path.basename(full_path.lower()))
@@ -215,4 +215,49 @@ def Search_texture_file(ALL_TEXTURES, full_path):
 	logging.error("\nTexture not found (tif and dds): " + full_path)
 
 	return ""
+
+
+def Search_texture_file_by_name(exported_textures, full_path):
+	'''
+	TODO: check texture mode, size for more preсise search ???
+	'''
+
+	file_name, file_ext = os.path.splitext(os.path.basename(os.path.normpath(full_path.lower())))
+	
+	for f_path in exported_textures:
+
+		f_name, f_ext = os.path.splitext(os.path.basename(os.path.normpath(f_path.lower())))
+		if (file_name == f_name):
+			# print("\n\n" + file_name + " already exported.\n")
+			return True
+
+	return False
+
+def Searach_texture(root_path, tex_file):
+	rel_path = ""
+
+	file_name, file_ext = os.path.splitext(os.path.basename(tex_file))
+
+	# if (tex_file.startswith("../") or tex_file.startswith("..\\")):
+	# print("\nTRY: " + tex_file)
+	all_textures = get_filepaths(root_path, "image")
+	
+	found_files = []
+	for tex in all_textures:
+		f, e = os.path.splitext(os.path.basename(tex.lower()))
+		if (file_name == f): found_files.append(tex)
+	
+	for p in found_files:
+		if ((not "defaults" in p) and (not "generic" in p) and (not "natural" in p)): # try exclude some cryengine default folders
+			rel_path = p.replace(root_path, "")
+			# print("\nREL PATH: " + rel_path + "\n")
+			break
+	
+	if (rel_path == ""):
+		for p in found_files:
+			rel_path = p.replace(root_path, "")
+			# print("\nREL PATH: " + rel_path + "\n")
+			break
+	
+	return rel_path
 
