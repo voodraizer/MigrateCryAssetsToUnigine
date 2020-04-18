@@ -145,7 +145,9 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 		tex_file = xml_get(tex, "file")
 
 		# ===============================================================================================================================
-		rel_path = Convert_mtl_texture_path(tex_file)
+		# ===============================================================================================================================
+		# ===============================================================================================================================
+		rel_path = Mtl_texture_path_to_relative(tex_file, mat_file_path) # Mtl_texture_path_to_relative_unigine
 
 		xml_child = ET.SubElement(xml_root, 'texture')
 		xml_child.text = rel_path
@@ -284,9 +286,8 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 
 		if (not os.path.exists(path_orig)): continue
 		
-		if not os.path.exists(path_rel): os.makedirs(path_rel)
-		
-		# imagemagic convert
+		if (not os.path.exists(path_rel)): os.makedirs(path_rel)
+
 		ImageConvert(path_orig, path_rel)
 		exported_textures.append(os.path.normpath(path_orig.lower()))
 	
@@ -310,53 +311,15 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 			if (os.path.normpath(full_path.lower()) in exported_textures):
 				# texture already convered
 				continue
-			
-			if (tex_map == "Diffuse"):
-				# albedo
-				if (os.path.exists(full_path)):
+
+			if (os.path.exists(full_path)):
+				ImageConvert(full_path, path_rel)
+				exported_textures.append(os.path.normpath(full_path.lower()))
+			else:
+				full_path = Search_texture_file(ALL_TEXTURES, full_path)
+				if (full_path != ""):
 					ImageConvert(full_path, path_rel)
 					exported_textures.append(os.path.normpath(full_path.lower()))
-				else:
-					full_path = Search_texture_file(ALL_TEXTURES, full_path)
-					if (full_path != ""):
-						ImageConvert(full_path, path_rel)
-						exported_textures.append(os.path.normpath(full_path.lower()))
-					
-					
-			
-			# if (tex_map == "Bumpmap"):
-			# 	# normal map
-			# 	if (os.path.exists(full_path)):
-			# 		# imagemagic convert
-			# 		ImageMagicConvert(path_orig, path_rel)
-			# 	else:
-			# 		# logging.error("\n Texture not found: " + rel_path)
-			# 		pass
-
-			# 	# shading
-			# 	shading_path = os.path.dirname(rel_path)
-			# 	filename, file_extension = os.path.splitext(rel_path)
-			# 	shading_path = shading_path + filename[:-2] + "_sh.tga"
-
-			# 	if (os.path.exists(os.path.join(DESTINATION_ASSETS_PATH, shading_path))):
-			# 		# imagemagic convert
-			# 		ImageMagicConvert(path_orig, path_rel)
-			# 	else:
-			# 		# logging.error("\n Texture not found: " + shading_path)
-			# 		pass
-				
-
-			# if (tex_map == "Opacity"):
-			# 	pass
-			
-			# if (tex_map == "Detail"):
-			# 	pass
-
-			# if (tex_map == "Custom"):
-			# 	pass
-			
-			# if (tex_map == "[1] Custom"):
-			# 	pass
 
 			
 	

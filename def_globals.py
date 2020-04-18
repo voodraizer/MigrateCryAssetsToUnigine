@@ -13,7 +13,6 @@ MATERIALS_XML = TMP_EXPORT_ASSETS_PATH + 'materials_list.xml'
 TEXTURES_XML = TMP_EXPORT_ASSETS_PATH + 'textures_list.xml'
 PREFABS_XML = TMP_EXPORT_ASSETS_PATH + 'prefabs_list.xml'
 LEVELS_XML = TMP_EXPORT_ASSETS_PATH + 'levels_list.xml'
-#TEXTURES_CONV_TMP = 'd:/Downloads/PyQt/TMP/'
 
 # Base materials.
 # MG_GENERAL = "/Game/Materials/General/MG_General"
@@ -32,7 +31,7 @@ LOG_EXPORTFROM_FILE = TMP_EXPORT_ASSETS_PATH + "export_from_log.txt"
 LOG_EXPORTTO_FILE = TMP_EXPORT_ASSETS_PATH + "export_to_log.txt"
 
 # DEBUG
-DEBUG_DISABLE_WAND = False
+DEBUG_DISABLE_IMAGE_CONV = False
 
 
 
@@ -112,9 +111,11 @@ def convert_suffixes_to_unigine(filename):
 
 	if (filename.endswith("_mask")):
 		base_filename = filename[:-5]
-		new_filename = base_filename + "_alb"
+		new_filename = base_filename + "_mask"
 	
 	if (filename.endswith("_detail")):
+		base_filename = filename[:-7]
+		new_filename = base_filename + "_detail"
 		pass
 	
 	if (filename.endswith("_sss")):
@@ -134,16 +135,12 @@ def Mtl_texture_path_to_relative_unigine(tex_file, mat_file_path):
 	'''
 
 	# Convert texture path.
-	new_filename, aaaa = os.path.splitext(os.path.basename(tex_file))
+	new_filename, new_ext = os.path.splitext(os.path.basename(tex_file))
 	new_filename = convert_suffixes_to_unigine(new_filename)
 	new_filename += ".tga"
 
 	rel_path = ''
-	# if (tex_file.startswith("./")):
-	# 	# path relative to current folder
-	# 	tex_file = tex_file[2:]
-	# 	rel_path = os.path.dirname(mat_file_path) + new_filename
-	# 	rel_path = rel_path.replace('\\','/')
+
 	if (tex_file.startswith("./")):
 		# path relative to current folder
 		rel_path = os.path.join(os.path.dirname(mat_file_path), os.path.dirname(tex_file[2:]), new_filename)

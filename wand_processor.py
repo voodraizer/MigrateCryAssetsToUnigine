@@ -13,7 +13,7 @@ def ImageConvert(img, dest_path):
 	CorruptImageError
 	'''
 
-	if (DEBUG_DISABLE_WAND): return	# Debug disable.
+	if (DEBUG_DISABLE_IMAGE_CONV): return	# Debug disable.
 
 	from wand.image import Image
 	from wand.color import Color
