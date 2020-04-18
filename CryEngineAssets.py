@@ -5,26 +5,20 @@ from def_globals import *
 
 
 
-def Create_models_xml_list(root_dir):
+def Create_models_xml_list():
 	'''
 	Create xml list from all models (fbx).
 	'''
-	# listOfFile = os.listdir(root_dir)
-	# for entry in listOfFile:
-	# 	if os.path.isdir(os.path.join(root_dir, entry)): print("Folder: ", entry)
-	# 	if os.path.isfile(os.path.join(root_dir, entry)): print("File: ", entry)
-	# 	# print(entry)
-	
 	
 	xml_root = ET.Element('Models')
 
-	full_file_paths = get_filepaths(root_dir, "model")
+	full_file_paths = get_filepaths(CRYENGINE_ASSETS_PATH, "model")
 	for p in full_file_paths:
 		child = ET.SubElement(xml_root, 'Model', {'path':p})
 
 		# Get cryasset for model.
-		cryasset = os.path.join(root_dir, p.replace(".fbx", ".cgf.cryasset"))
-		if (not os.path.exists(cryasset)):
+		cryasset = os.path.join(CRYENGINE_ASSETS_PATH, p.replace(".fbx", ".cgf.cryasset"))
+		if (not os.path.isfile(cryasset)):
 			logging.error("\n\t\t\tCryasset not found.\n\t\t\t" + cryasset)
 			continue
 		
@@ -60,7 +54,7 @@ def Validate_materals_xml_paths():
 			rel_path = xml_get(tex, "file")
 			rel_path_orig = xml_get(tex, "file_orig")
 			full_path = os.path.join(CRYENGINE_ASSETS_PATH, rel_path)
-			if (rel_path == "" or not os.path.exists(full_path)):
+			if (not os.path.isfile(full_path)):
 				logging.error("\n\t\t\tMaterial texture missing: " + rel_path + "\n\t\t\t" + full_path + "\n\t\t\t" + rel_path_orig)
 				error_count += 1
 	
@@ -69,24 +63,25 @@ def Validate_materals_xml_paths():
 	pass
 
 
-def Create_materials_xml_list(root_dir):
+def Create_materials_xml_list():
 	'''
 	Create xml list from materials (mtl).
 	'''
 
+	# for additional search textures.
 	all_textures = get_filepaths(CRYENGINE_ASSETS_PATH, "image")
 
 
 	xml_root = ET.Element('Materials')
 
-	full_file_paths = get_filepaths(root_dir, "material")
+	full_file_paths = get_filepaths(CRYENGINE_ASSETS_PATH, "material")
 
 	for p in full_file_paths:
-		cry_mtl_obj = ParseCryMtlFile(os.path.join(root_dir, p))
+		cry_mtl_obj = ParseCryMtlFile(os.path.join(CRYENGINE_ASSETS_PATH, p))
 		
 		for mat in cry_mtl_obj["materials"]:
 			mat_child = ET.SubElement(xml_root, 'Material')
-			mat_child.set('mtl_file', cry_mtl_obj.get("mtl_file")[len(root_dir):])
+			mat_child.set('mtl_file', cry_mtl_obj.get("mtl_file")[len(CRYENGINE_ASSETS_PATH):])
 			mat_child.set('name', mat.get("name"))
 			mat_child.set('shader', mat.get("shader"))
 			mat_child.set('gen_mask', mat.get("gen_mask"))
@@ -112,10 +107,12 @@ def Create_materials_xml_list(root_dir):
 				if (orig_tex_path.startswith("./")):
 					# path relative to current folder
 					search_path = os.path.normpath(os.path.join(mat_file_dir, os.path.dirname(orig_tex_path), os.path.basename(orig_tex_path)))
-					if (not os.path.exists(search_path)):
-						# print("Path not: " + search_path)
-						# Search_texture_file(all_textures, search_path)
-						tex_child.set('file', "")
+					if (not os.path.isfile(search_path)):
+						search_path = Search_texture_by_name(search_path.lower(), all_textures)
+						if (not os.path.isfile(search_path)):
+							tex_child.set('file', "")
+						else:
+							tex_child.set('file', search_path[len(CRYENGINE_ASSETS_PATH):])
 					else:
 						tex_child.set('file', search_path[len(CRYENGINE_ASSETS_PATH):])
 					pass
@@ -123,7 +120,7 @@ def Create_materials_xml_list(root_dir):
 				if (orig_tex_path.lower().startswith("models")):
 					# path relative to models
 					search_path = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, os.path.dirname(orig_tex_path), os.path.basename(orig_tex_path)))
-					if (not os.path.exists(search_path)):
+					if (not os.path.isfile(search_path)):
 						# print("Path not: " + search_path)
 						tex_child.set('file', "")
 					else:
@@ -133,7 +130,7 @@ def Create_materials_xml_list(root_dir):
 				if (orig_tex_path.lower().startswith("textures")):
 					# path relative to textures
 					search_path = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, os.path.dirname(orig_tex_path), os.path.basename(orig_tex_path)))
-					if (not os.path.exists(search_path)):
+					if (not os.path.isfile(search_path)):
 						# print("Path not: " + search_path)
 						tex_child.set('file', "")
 					else:
@@ -142,11 +139,27 @@ def Create_materials_xml_list(root_dir):
 
 				if (orig_tex_path.lower().startswith("objects")):
 					search_path = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, os.path.dirname(orig_tex_path), os.path.basename(orig_tex_path)))
-					if (not os.path.exists(search_path)):
+					if (not os.path.isfile(search_path)):
 						# print("Path not: " + search_path)
 						tex_child.set('file', "")
 					else:
 						tex_child.set('file', search_path[len(CRYENGINE_ASSETS_PATH):])
+					pass
+
+				if (orig_tex_path.lower().startswith("../") or orig_tex_path.lower().startswith("..\\")):
+					search_path = ""
+
+					if (orig_tex_path.lower().startswith("../")):
+						search_path = Search_texture_by_path(orig_tex_path.lower(), "../", all_textures)
+					if (orig_tex_path.lower().startswith("..\\")):
+						search_path = Search_texture_by_path(orig_tex_path.lower(), "..\\", all_textures)
+					
+					if (not os.path.isfile(search_path)):
+						# print("Path not: " + orig_tex_path)
+						tex_child.set('file', "")
+					else:
+						tex_child.set('file', search_path[len(CRYENGINE_ASSETS_PATH):])
+						# print(search_path)
 					pass
 				
 
@@ -161,14 +174,14 @@ def Create_materials_xml_list(root_dir):
 	pass
 
 
-def Create_textures_xml_list(root_dir):
+def Create_textures_xml_list():
 	'''
 	Create xml list from textures (tif).
 	'''
 
 	xml_root = ET.Element('Textures')
 
-	full_file_paths = get_filepaths(root_dir, "image")
+	full_file_paths = get_filepaths(CRYENGINE_ASSETS_PATH, "image")
 	for p in full_file_paths:
 		
 		import re
@@ -188,7 +201,7 @@ def Create_textures_xml_list(root_dir):
 	pass
 
 
-def Create_prefabs_xml_list(root_dir):
+def Create_prefabs_xml_list():
 	'''
 	Create xml list from prefabs.
 	'''
@@ -196,7 +209,7 @@ def Create_prefabs_xml_list(root_dir):
 	pass
 
 
-def Create_levels_xml_list(root_dir):
+def Create_levels_xml_list():
 	'''
 	Create xml list from levels.
 	'''

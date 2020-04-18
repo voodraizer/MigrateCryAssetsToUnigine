@@ -157,21 +157,42 @@ def Search_texture_file(ALL_TEXTURES, full_path):
 	return ""
 
 
-def Search_texture_file_by_name(exported_textures, full_path):
+def Search_texture_by_name(full_path, all_textures):
 	'''
 	TODO: check texture mode, size for more preсise search ???
 	'''
 
 	file_name, file_ext = os.path.splitext(os.path.basename(os.path.normpath(full_path.lower())))
 	
-	for f_path in exported_textures:
+	for f_path in all_textures:
 
 		f_name, f_ext = os.path.splitext(os.path.basename(os.path.normpath(f_path.lower())))
 		if (file_name == f_name):
 			# print("\n\n" + file_name + " already exported.\n")
-			return True
+			return os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, f_path))
 
-	return False
+	return ""
+
+def Search_texture_by_path(tex_path, replace_symbol, all_textures):
+	if (tex_path.lower().startswith(replace_symbol)):
+		path = tex_path.replace(replace_symbol, "").replace("/", "\\").replace("main", "").replace("cryengine", "").replace("gamesdk", "").replace("art", "").replace("0az", "").lower().split("\\")
+		# print(list(path))
+
+		m_path = ""
+		if (len(path) > 3):
+			m_path = path[-2] + "\\" + path[-1]
+		if (len(path) > 4):
+			m_path = path[-3] + "\\" + path[-2] + "\\" + path[-1]
+		if (len(path) > 5):
+			m_path = path[-4] + "\\" + path[-3] + "\\" + path[-2] + "\\" + path[-1]
+			
+		# print(m_path)
+		for p in all_textures:
+			if (m_path in p.lower()):
+				return os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, p))
+			
+	return ""
+
 
 def Search_texture(root_path, tex_file):
 	rel_path = ""
