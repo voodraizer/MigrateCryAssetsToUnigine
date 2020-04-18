@@ -129,66 +129,6 @@ def convert_suffixes_to_unigine(filename):
 	return new_filename
 
 
-def Mtl_texture_path_to_relative_unigine(tex_file, mat_file_path):
-	'''
-
-	'''
-
-	# Convert texture path.
-	new_filename, new_ext = os.path.splitext(os.path.basename(tex_file))
-	new_filename = convert_suffixes_to_unigine(new_filename)
-	new_filename += ".tga"
-
-	rel_path = ''
-
-	if (tex_file.startswith("./")):
-		# path relative to current folder
-		rel_path = os.path.join(os.path.dirname(mat_file_path), os.path.dirname(tex_file[2:]), new_filename)
-		rel_path = rel_path.replace('\\','/')
-		
-	if (tex_file.lower().startswith("models")):
-		# path relative to models
-		rel_path = os.path.join(os.path.dirname(mat_file_path), "Textures", new_filename).replace('\\','/')
-		pass
-	if (tex_file.lower().startswith("textures")):
-		# path relative to textures
-		rel_path = (os.path.dirname(tex_file) + "/" + new_filename).replace('\\','/')
-	
-	return rel_path
-
-def Mtl_texture_path_to_relative(tex_file, mat_file_path):
-	'''
-
-	'''
-
-	# Convert texture path.
-	file_name, file_ext = os.path.splitext(os.path.basename(tex_file))
-
-	rel_path = ''
-		
-	if (tex_file.startswith("./")):
-		# path relative to current folder
-		rel_path = os.path.join(os.path.dirname(mat_file_path), os.path.dirname(tex_file[2:]), file_name) + file_ext
-		
-	if (tex_file.lower().startswith("models")):
-		# path relative to models
-		rel_path = os.path.join(os.path.dirname(mat_file_path), "Textures", file_name).replace('\\','/') + file_ext
-		
-	if (tex_file.lower().startswith("textures")):
-		# path relative to textures
-		rel_path = (os.path.dirname(tex_file) + "/" + file_name).replace('\\','/') + file_ext
-
-	if (tex_file.lower().startswith("objects")):
-		# path relative to objects
-		rel_path = tex_file
-	
-	rel_path = rel_path.replace('\\','/')
-
-	if (rel_path == ""): logging.error("\nWrong path convert: " + tex_file + "\nResult: " + rel_path)
-
-	return rel_path
-
-
 def Search_texture_file(ALL_TEXTURES, full_path):
 	'''
 	1. search original tif file from full_path.
@@ -233,7 +173,7 @@ def Search_texture_file_by_name(exported_textures, full_path):
 
 	return False
 
-def Searach_texture(root_path, tex_file):
+def Search_texture(root_path, tex_file):
 	rel_path = ""
 
 	file_name, file_ext = os.path.splitext(os.path.basename(tex_file))

@@ -147,7 +147,7 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 		# ===============================================================================================================================
 		# ===============================================================================================================================
 		# ===============================================================================================================================
-		rel_path = Mtl_texture_path_to_relative(tex_file, mat_file_path) # Mtl_texture_path_to_relative_unigine
+		rel_path = "" #Mtl_texture_path_to_relative(tex_file, mat_file_path) # Mtl_texture_path_to_relative_unigine
 
 		xml_child = ET.SubElement(xml_root, 'texture')
 		xml_child.text = rel_path
@@ -304,26 +304,20 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 			tex_map = xml_get(tex, "map")
 			tex_file = xml_get(tex, "file")
 
-			rel_path = Mtl_texture_path_to_relative(tex_file, mat_file_path)
-			full_path = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, rel_path))
+			# rel_path = Mtl_texture_path_to_relative(tex_file, mat_file_path)
+			# full_path = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, rel_path))
 			# logging.info("\nTexture: " + tex_file)
+			full_path = os.path.normpath(os.path.join(CRYENGINE_ASSETS_PATH, tex_file))
 
 			if (os.path.normpath(full_path.lower()) in exported_textures):
 				# texture already convered.
 				continue
 
-			if (Search_texture_file_by_name(exported_textures, full_path)):
-				# texture already convered in other colation.
-				continue
-
-			if (os.path.exists(full_path)):
+			if (tex_file != "" and os.path.exists(full_path)):
 				ImageConvert(full_path, path_rel)
 				exported_textures.append(os.path.normpath(full_path.lower()))
 			else:
-				full_path = Search_texture_file(ALL_TEXTURES, full_path)
-				if (full_path != ""):# and not Search_texture_file_by_name(exported_textures, full_path)):
-					ImageConvert(full_path, path_rel)
-					exported_textures.append(os.path.normpath(full_path.lower()))
+				logging.error("\n\t\t\tTexture missing: " + full_path + "\n\t\t\t")
 
 			
 	
