@@ -18,11 +18,12 @@ logging.info("==================================== START =======================
 
 # ParseModels(MODELS_XML)
 
-Create_textures_xml_list(CRYENGINE_ASSETS_PATH)
-Create_materials_xml_list(CRYENGINE_ASSETS_PATH)
-Create_models_xml_list(CRYENGINE_ASSETS_PATH)
-# Create_prefabs_xml_list(CRYENGINE_ASSETS_PATH)
-# Create_levels_xml_list(CRYENGINE_ASSETS_PATH)
+# Create_textures_xml_list()
+Create_materials_xml_list()
+# Create_models_xml_list()
+# Create_prefabs_xml_list()
+# Create_levels_xml_list()
+
 
 
 logging.info("\n\n==================================== END ====================================")

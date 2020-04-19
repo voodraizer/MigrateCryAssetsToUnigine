@@ -330,4 +330,4 @@ def Convert_fbx_model_to_unigine(fbx_orig_path, fbx_exp_path):
 fbx_orig_path = "c:/GITs/MigrateCryAssetsToUnity/GenerateCryAssetsList/__EXAMPLES/Tractor_a.fbx"
 fbx_exp_path = "c:/GITs/MigrateCryAssetsToUnity/GenerateCryAssetsList/__EXAMPLES/out.fbx"
 # Split_mesh_by_material(fbx_path, fbx_file)
-Convert_fbx_model_to_unigine(fbx_orig_path, fbx_exp_path)
+# Convert_fbx_model_to_unigine(fbx_orig_path, fbx_exp_path)
