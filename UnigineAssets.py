@@ -144,10 +144,12 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 		tex_map = xml_get(tex, "map")
 		tex_file = xml_get(tex, "file")
 
-		# ===============================================================================================================================
-		# ===============================================================================================================================
-		# ===============================================================================================================================
-		rel_path = "" #Mtl_texture_path_to_relative(tex_file, mat_file_path) # Mtl_texture_path_to_relative_unigine
+		# to unigine texture paths
+		filename, file_extension = os.path.splitext(os.path.basename(tex_file))
+		new_filename = convert_suffixes_to_unigine(filename)
+		rel_path = os.path.normpath(os.path.join(os.path.dirname(tex_file), new_filename)).replace("\\", "/") + ".tga"
+		full_path = os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, rel_path)).replace("\\", "/")
+		
 
 		xml_child = ET.SubElement(xml_root, 'texture')
 		xml_child.text = rel_path
@@ -155,23 +157,34 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 		if (tex_map == "Diffuse"):
 			# albedo
 			xml_child.set('name', "albedo")
+			if (os.path.isfile(full_path)):
+				xml_child.text = rel_path
+			else:
+				# xml_child.text = "guid://5219d6ddb5dbd1520e843a369ad2b64326bb24e2"	# white texture from core/textures/common/
+				xml_child.text = "Textures/cry_missing/pink_alb.tga"
+
+
 			
 		if (tex_map == "Bumpmap"):
 			# normal map
 			xml_child.set('name', "normal")
-			# xml_child.text = "guid://692dbb7d56d633e22551bd47f4d92cd2d498270d" # default normal
+			if (os.path.isfile(full_path)):
+				xml_child.text = rel_path
+			else:
+				# xml_child.text = "guid://692dbb7d56d633e22551bd47f4d92cd2d498270d" # default normal
+				xml_child.text = "Textures/cry_missing/normal_n.tga"
 
 			# shading
+			rel_path = rel_path[:-6] + "_sh.tga"
+			full_path = os.path.normpath(os.path.join(DESTINATION_ASSETS_PATH, rel_path)).replace("\\", "/")
 			xml_child = ET.SubElement(xml_root, 'texture')
-			shading_path = os.path.dirname(rel_path)
-			filename, file_extension = os.path.splitext(rel_path)
-			shading_path = shading_path + filename[:-2] + "_sh.tga"
-			if (os.path.exists(os.path.join(DESTINATION_ASSETS_PATH, shading_path))):
-				xml_child.text = shading_path
-			else:
-				xml_child.text = "guid://5219d6ddb5dbd1520e843a369ad2b64326bb24e2"	# white texture from core/textures/common/
-				logging.error("\n Texture not found: " + shading_path)
+
 			xml_child.set('name', "shading")
+			if (os.path.isfile(full_path)):
+				xml_child.text = rel_path
+			else:
+				xml_child.text = "Textures/cry_missing/normal_sh.tga"
+
 
 		
 		
@@ -215,12 +228,24 @@ def CreateUnigineXmlMaterial(cry_xml_root, unigine_mat_path):
 	return xml_root
 
 
-def ParseMaterialsXmlList(xml_file):
+def Create_default_materials():
+	'''
+	Root materials.
+
+	'''
+
+	pass
+
+def ParseMaterialsXmlList():
 	'''
 	
 	'''
 
-	tree = ET.parse(xml_file)
+	#
+	Create_default_materials()
+
+	#
+	tree = ET.parse(MATERIALS_XML)
 	root = tree.getroot()
 
 	for mat in root.iter('Material'):
@@ -237,19 +262,19 @@ def ParseMaterialsXmlList(xml_file):
 		unigine_mat_path = os.path.join(path_rel, xml_get(mat, "name")) + ".mat"
 		unigine_mat_path_rel = os.path.join(os.path.dirname(cry_mat_file_path), "materials") + "\\" + xml_get(mat, "name") + ".mat"
 
-		# print("==================================================")
-		# print(path_rel)
-		# print(os.path.join(path_rel, xml_get(mat, "name")) + ".mat")
-		# print("==================================================")
-
-		# cry_mtl_obj = ParseCryMtlFile(os.path.join(root_dir, p))
 		unigine_mat_xml = CreateUnigineXmlMaterial(mat, unigine_mat_path_rel)
 
 		if not os.path.exists(path_rel):
 			os.makedirs(path_rel)
-		
+		# print("========================================" + unigine_mat_path)
 		tree = ET.ElementTree(unigine_mat_xml)
-		tree.write(unigine_mat_path)
+		try:
+			tree.write(unigine_mat_path)
+		except OSError:
+			logging.error("\nUnable save material: " + cry_mat_file_path + "\n")
+
+		# logging.info("\n\n" + cry_mat_file_path + "\n" + xml_prettify(tree.getroot()) + "\n\n")
+	
 
 	pass
 
@@ -258,7 +283,7 @@ def ParseMaterialsXmlList(xml_file):
 # Textures.
 # =============================================================================
 
-def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
+def ParseTexturesXmlList():
 	'''
 	Convert and copy all tif textures from textures_xml.
 	Convert and copy all textures (tif, dds) from materials_xml.
@@ -268,14 +293,13 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 	from pillow_processor import ImageConvert
 
 	# Collect all dds and tif paths in project.
-	ALL_TEXTURES = []
-	ALL_TEXTURES = get_filepaths(CRYENGINE_ASSETS_PATH, "image")
+	# all_textures = get_filepaths(CRYENGINE_ASSETS_PATH, "image")
 
 	exported_textures = []
 
 
 	# parse textures_xml file.
-	tree = ET.parse(xml_tex_file)
+	tree = ET.parse(TEXTURES_XML)
 	root = tree.getroot()
 
 	for tex in root.iter('Texture'):
@@ -293,7 +317,7 @@ def ParseTexturesXmlList(xml_tex_file, xml_mat_file):
 	
 
 	# parse materials_xml file.
-	tree = ET.parse(xml_mat_file)
+	tree = ET.parse(MATERIALS_XML)
 	root = tree.getroot()
 
 	for mat in root.iter('Material'):

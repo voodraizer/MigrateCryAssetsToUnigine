@@ -10,8 +10,8 @@ logging.info("==================================== START =======================
 # =============================================================================
 # Export to Unigine.
 # =============================================================================
-ParseTexturesXmlList(TEXTURES_XML, MATERIALS_XML)
-# ParseMaterialsXmlList(MATERIALS_XML)
+# ParseTexturesXmlList()
+ParseMaterialsXmlList()
 # ParseModelsXmlList(MODELS_XML)
 
 
