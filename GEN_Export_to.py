@@ -11,8 +11,9 @@ logging.info("==================================== START =======================
 # Export to Unigine.
 # =============================================================================
 # ParseTexturesXmlList()
-ParseMaterialsXmlList()
-# ParseModelsXmlList(MODELS_XML)
+# ParseMaterialsXmlList()
+# ParseModelsXmlList()
+Create_prefabs()
 
 
 

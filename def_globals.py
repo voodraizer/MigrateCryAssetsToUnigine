@@ -14,6 +14,12 @@ TEXTURES_XML = TMP_EXPORT_ASSETS_PATH + 'textures_list.xml'
 PREFABS_XML = TMP_EXPORT_ASSETS_PATH + 'prefabs_list.xml'
 LEVELS_XML = TMP_EXPORT_ASSETS_PATH + 'levels_list.xml'
 
+# Prefabs to export.
+CRY_PREFABS = ["buildings", "bridges"]
+
+# Levels to export.
+CRY_LEVELS = []
+
 # Base materials.
 # MG_GENERAL = "/Game/Materials/General/MG_General"
 # MG_TREES = "/Game/Materials/General/MG_Trees"
