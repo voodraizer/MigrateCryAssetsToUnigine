@@ -13,7 +13,7 @@ logging.info("==================================== START =======================
 # ParseTexturesXmlList()
 # ParseMaterialsXmlList()
 # ParseModelsXmlList()
-Create_prefabs()
+# Create_prefabs()
 
 
 
