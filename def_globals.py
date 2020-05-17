@@ -3,9 +3,10 @@ import os
 import logging
 
 # Engines assets.
-CRYENGINE_ASSETS_PATH = "d:/CRY_MIGRATE/Assets/" ### "d:/___TMP_CRY_ASSETS/Assets/"
-TMP_EXPORT_ASSETS_PATH = "D:/___TMP_UNIGINE_EXPORT/"
-DESTINATION_ASSETS_PATH = "d:/UNIGINE Projects/UNIGINE_MIGRATE_FROM_CRY/data/" ### "d:/UNIGINE Projects/Test_1/data/"
+CRYENGINE_ASSETS_PATH = "d:/CRY_MIGRATE/Assets/"
+TMP_EXPORT_ASSETS_PATH = "d:/CRY_MIGRATE/___TMP_EXPORT/"
+DESTINATION_ASSETS_PATH = "d:/UNIGINE Projects/0AZ/data/"
+ART_ASSETS_PATH = "d:/Art/__MyProjects/0AZ/"
 
 # Exported xml.
 MODELS_XML = TMP_EXPORT_ASSETS_PATH + 'models_list.xml'

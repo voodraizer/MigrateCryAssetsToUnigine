@@ -7,6 +7,9 @@
 /**/[Ll]ogs/
 /**/[Mm]emoryCaptures/
 /**/__EXAMPLES/
+.idea/*
+
+__TODO__.txt
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/**/[Aa]ssets/**/*.meta
