@@ -66,6 +66,9 @@ def CreateTestPrefab():
 
 
 def CreatePrefabs():
+	logging.basicConfig(filename="D:/LOG_PREFABS.txt", filemode="w", level=logging.INFO)
+	logging.info("==================================== START ====================================\n\n")
+
 	prefab_all = ["prefabs/bridges.xml", "prefabs/buildings.xml"]
 
 	for path in prefab_all:
@@ -86,6 +89,9 @@ def CreatePrefabs():
 			dummy.set("name", pref_name.split(".")[-1])
 
 			for obj in pref.iter("Object"):
+
+				type = xml_get(obj, "Type")
+
 				pos = xml_get(obj, "Pos")
 				rot = xml_get(obj, "Rotate")
 				scale = xml_get(obj, "Scale")
@@ -94,14 +100,23 @@ def CreatePrefabs():
 				rot = ListFromString(rot)
 				scale = ListFromString(scale, [1, 1, 1])
 
-				CreateNodeFromFbx(dummy, xml_get(obj, "Prefab"), xml_get(obj, "Name"), pos, rot, scale)
+				if (type == "Brush"):
+					CreateNodeFromFbx(dummy, xml_get(obj, "Prefab"), xml_get(obj, "Name"), pos, rot, scale)
+
+				if (type == "Decal"):
+					mat = xml_get(obj, "Material")
+					s_prior = xml_get(obj, "SortPriority")
+					depth = xml_get(obj, "ProjectionDepth")
+					CreateNodeFromDecal(dummy, mat, depth, pos, rot, scale)
+
 
 			pref_name = pref_name.split(".")
 			pref_path = def_globals.DESTINATION_ASSETS_PATH + "prefabs/" + os.path.basename(path)[:-4] + "/"
 			pref_path = pref_path + "/".join(pref_name[:-1]) + "/"
 			pref_path = pref_path + pref_name[-1] + ".node"
+			pref_path = pref_path.replace("//", "/")
 
-			print(pref_path)
+
 			indent(nodes_root)
 			tree = ET.ElementTree(nodes_root)
 
@@ -109,13 +124,13 @@ def CreatePrefabs():
 			tree.write(pref_path)
 
 			print("==================================================")
-			# print(xml_prettify(tree))
-			# print(indent(nodes_root))
-			# indent(nodes_root)
+			# print(pref_path)
 			# ET.dump(nodes_root)
 			print("==================================================")
 
 		pass
+
+	logging.info("\n\n==================================== END ====================================")
 	pass
 
 # =============================================================================
