@@ -3,9 +3,10 @@ import os
 import logging
 
 # Engines assets.
-CRYENGINE_ASSETS_PATH = "d:/CRY_MIGRATE/Assets/" ### "d:/___TMP_CRY_ASSETS/Assets/"
-TMP_EXPORT_ASSETS_PATH = "D:/___TMP_UNIGINE_EXPORT/"
-DESTINATION_ASSETS_PATH = "d:/UNIGINE Projects/UNIGINE_MIGRATE_FROM_CRY/data/" ### "d:/UNIGINE Projects/Test_1/data/"
+CRYENGINE_ASSETS_PATH = "d:/CRY_MIGRATE/Assets/"
+TMP_EXPORT_ASSETS_PATH = "d:/CRY_MIGRATE/___TMP_EXPORT/"
+DESTINATION_ASSETS_PATH = "d:/UNIGINE Projects/0AZ/data/"
+ART_ASSETS_PATH = "d:/Art/__MyProjects/0AZ/"
 
 # Exported xml.
 MODELS_XML = TMP_EXPORT_ASSETS_PATH + 'models_list.xml'
@@ -13,6 +14,12 @@ MATERIALS_XML = TMP_EXPORT_ASSETS_PATH + 'materials_list.xml'
 TEXTURES_XML = TMP_EXPORT_ASSETS_PATH + 'textures_list.xml'
 PREFABS_XML = TMP_EXPORT_ASSETS_PATH + 'prefabs_list.xml'
 LEVELS_XML = TMP_EXPORT_ASSETS_PATH + 'levels_list.xml'
+
+# Prefabs to export.
+CRY_PREFABS = ["buildings", "bridges"]
+
+# Levels to export.
+CRY_LEVELS = []
 
 # Base materials.
 # MG_GENERAL = "/Game/Materials/General/MG_General"

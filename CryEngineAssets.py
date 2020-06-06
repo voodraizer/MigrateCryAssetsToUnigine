@@ -200,15 +200,6 @@ def Create_textures_xml_list():
 
 	pass
 
-
-def Create_prefabs_xml_list():
-	'''
-	Create xml list from prefabs.
-	'''
-
-	pass
-
-
 def Create_levels_xml_list():
 	'''
 	Create xml list from levels.
@@ -282,3 +273,5 @@ def ParseModels(xml_file):
 		for mat in model.iter('Material'):
 			# parse materials
 			print("		", mat.get("name"), " ", mat.get("path"))
+
+

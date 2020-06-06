@@ -10,13 +10,13 @@ from def_globals import *
 # =============================================================================
 # Models.
 # =============================================================================
-def ParseModelsXmlList(xml_file):
+def ParseModelsXmlList():
 	'''
 	
 	'''
-	# print("XML file: " + xml_file)
+	# print("XML file: " + MODELS_XML)
 
-	tree = ET.parse(xml_file)
+	tree = ET.parse(MODELS_XML)
 	root = tree.getroot()
 
 	#all_textures = root.iter('Texture')
@@ -350,3 +350,45 @@ def ParseTexturesXmlList():
 	pass
 
 
+#
+#
+def Create_prefabs():
+	'''
+
+	'''
+
+	prefabs_path = os.path.join(CRYENGINE_ASSETS_PATH, "prefabs")
+
+	for prefabs_xml_path in CRY_PREFABS:
+		path = os.path.join(prefabs_path, prefabs_xml_path) + ".xml"
+		if (not os.path.isfile(path)): continue
+
+		tree = ET.parse(path)
+		root = tree.getroot()
+		for prefab in root.iter('Prefab'):
+			prefab.get("Name")
+			prefab.get("Id")
+			prefab.get("Library")
+
+			print("Prefab: " + prefab.get("Name"))
+
+			for cry_object in prefab.getchildren()[0].iter("Object"):
+				# 
+				p_type = cry_object.get("Type")
+				cry_object.get("Layer")
+				cry_object.get("Name")
+				cry_object.get("Pos")
+				cry_object.get("Rotate")
+				cry_object.get("Scale")
+				
+				if (p_type == "Decal"):
+					cry_object.get("Material")
+				if (p_type == "Brush"):
+					cry_object.get("Prefab")
+
+				print("\tObject: " + cry_object.get("Name"))
+		pass
+
+		pass
+
+	pass
