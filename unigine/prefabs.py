@@ -11,7 +11,6 @@ import def_globals
 from utils import *
 
 
-
 def CreateTestPrefab():
 	pref_path = def_globals.CRYENGINE_ASSETS_PATH + "prefabs/buildings.xml"
 
@@ -65,6 +64,46 @@ def CreateTestPrefab():
 	pass
 
 
+def CreateTestPrefab2():
+	import xml.etree.ElementTree as ET
+
+	xml_str = '''
+<nodes version="2.11.0.0">
+	<node type="ObjectMeshStatic" id="1875505392" name="Cuboid">
+		<mesh_name>guid://47595c25764c5f40f983499f67f60a729138e729</mesh_name>
+		<surface name="box" physics_friction="1" physics_restitution="1" material="cd7481db00c6468ea887becf746f75afc391b964" />
+		<transform>1 0 0 0.0 0 1 0 0.0 0 0 1 0.0 0 0 0 1.0</transform>
+		<node material="40c5c8b9ddfacc2496922c93e9cb03359ea0c6a8" type="DecalOrtho" id="1726391148" name="DecalOrtho">
+			<radius>0.200000003</radius>
+			<width>2</width>
+			<height>1.5</height>
+			<znear>0.00100000005</znear>
+			<transform>1 0 0 0.0 0 -1.1920925e-07 0.99999958 0.0 0 -0.99999958 -1.1920925e-07 0.0 0.00010681152 -0.3000412 0.29999977 1.0</transform>
+		</node>
+	</node>
+</nodes>
+	'''
+
+	xml_str = '''
+	<nodes version="2.11.0.0">
+		<node type="ObjectMeshStatic" id="1875505392" name="bricks_house_01a1">
+			<mesh_name>guid://35c59a2ac0fe8381495a06ec81cf555bc5db8afe</mesh_name>
+			<surface name="Bricks_house_01_bricks" physics_friction="1" physics_restitution="1" material="cd7481db00c6468ea887becf746f75afc391b964" />
+			<transform>1 0 0 0.0 0 1 0 0.0 0 0 1 0.0 0 0 0 1.0</transform>
+		</node>
+	</nodes>
+		'''
+
+	tree = ET.ElementTree(ET.fromstring(xml_str))
+
+	root = tree.getroot()
+	indent(root)
+	tree = ET.ElementTree(root)
+	tree.write("d:/UNIGINE Projects/0AZ/data/___TEST/GEN_2.node")
+
+	pass
+
+
 def CreatePrefabs():
 	logging.basicConfig(filename="D:/LOG_PREFABS.txt", filemode="w", level=logging.INFO)
 	logging.info("==================================== START ====================================\n\n")
@@ -110,15 +149,10 @@ def CreatePrefabs():
 					CreateNodeFromDecal(dummy, mat, depth, pos, rot, scale)
 
 
-			pref_name = pref_name.split(".")
-			pref_path = def_globals.DESTINATION_ASSETS_PATH + "prefabs/" + os.path.basename(path)[:-4] + "/"
-			pref_path = pref_path + "/".join(pref_name[:-1]) + "/"
-			pref_path = pref_path + pref_name[-1] + ".node"
-			pref_path = pref_path.replace("//", "/")
-
-
 			indent(nodes_root)
 			tree = ET.ElementTree(nodes_root)
+
+			pref_path = GetNodePathFromPrefabName(path, pref_name)
 
 			if (not os.path.exists(os.path.dirname(pref_path))): os.makedirs(os.path.dirname(pref_path))
 			tree.write(pref_path)
@@ -138,6 +172,7 @@ def CreatePrefabs():
 # =============================================================================
 if __name__ == "__main__":
 	# CreateTestPrefab()
+	# CreateTestPrefab2()
 
-	CreatePrefabs()
+	# CreatePrefabs()
 	pass

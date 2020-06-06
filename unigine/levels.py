@@ -75,11 +75,34 @@ def ParseLayerFile(level_path, nodes_root):
 				pass
 
 			if (xml_get(obj, "Type") == "Prefab"):
+				name = xml_get(obj, "Name")
 				guid = xml_get(obj, "PrefabGUID")
-				# prefabs.AddPrefab()
+				pos = xml_get(obj, "Pos")
+				rot = xml_get(obj, "Rotate")
+				scale = xml_get(obj, "Scale")
+
+				pos = ListFromString(pos)
+				rot = ListFromString(rot)
+				scale = ListFromString(scale, [1, 1, 1])
+
+				AddNodeFromPrefab(nodes_root, guid, pos, rot, scale)
 				pass
 
 			if (xml_get(obj, "Type") == "Decal"):
+				name = xml_get(obj, "Name")
+				guid = xml_get(obj, "PrefabGUID")
+				pos = xml_get(obj, "Pos")
+				rot = xml_get(obj, "Rotate")
+				scale = xml_get(obj, "Scale")
+
+				pos = ListFromString(pos)
+				rot = ListFromString(rot)
+				scale = ListFromString(scale, [1, 1, 1])
+
+				CreateNodeFromDecal(nodes_root, mat, depth, pos, rot, scale)
+				pass
+
+			if (xml_get(obj, "Type") == "Rope"):
 				pass
 
 
@@ -123,10 +146,24 @@ def ConvertLevel(level_path, level_name):
 
 
 def Convert():
+	logging.basicConfig(filename="D:/LOG_LEVELS.txt", filemode="w", level=logging.INFO)
+	logging.info("==================================== START ====================================\n\n")
+
 	levels_path = def_globals.CRYENGINE_ASSETS_PATH + "levels/_samples/"
 
-	ConvertLevel(levels_path, "sample_woodcut")
+	all_levels = ["sample_woodcut", "sample_train_station_01", "sample_storage_area",
+	              "sample_rural_farm", "sample_refinery_plant", "sample_plant_07",
+	              "sample_plant_06", "sample_plant_05", "sample_plant_04", "sample_plant_03",
+	              "sample_plant_02", "sample_plant_01", "sample_gas_station", "sample_forest_01",
+	              "sample_construction_site_01", "sample_bridge_02", "sample_bridge_01",
+	              "sample_base", "sample_airbase_01"]
 
+	# ConvertLevel(levels_path, "sample_woodcut")
+
+	for level in all_levels:
+		ConvertLevel(levels_path, level)
+
+	logging.info("\n\n==================================== END ====================================")
 	pass
 
 

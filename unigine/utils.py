@@ -122,9 +122,25 @@ def random_with_N_digits(n):
 
 def CreateNodeFromFbx(nodes_root, fbx_path, name, pos, rot, scale):
 
+	def GetMatNameFromPath(fbx_path, mat_name):
+
+		mat_path = os.path.join(os.path.dirname(def_globals.DESTINATION_ASSETS_PATH + fbx_path.replace("Assets", "")), "materials")
+		mat_path += "\\" + mat_name + ".mat"
+
+		if (not os.path.exists(mat_path)):
+			logging.error("\nFbx material not found: " + mat_path + "\n")
+			return mat_name
+
+		tree = ET.parse(mat_path)
+		root = tree.getroot()
+		mat_name = xml_get(root, "name")
+
+		return mat_name
+
 	def GetMeshData(fbx_path):
 		fbx_path = fbx_path.replace(".cgf", ".fbx")
-		meta = def_globals.DESTINATION_ASSETS_PATH + fbx_path + ".meta"
+		meta = os.path.join(def_globals.DESTINATION_ASSETS_PATH, fbx_path.replace("Assets/", "")) + ".meta"
+
 		if (not os.path.exists(meta)):
 			logging.error("\nFbx meta not found: " + meta + "\n")
 			return [], []
@@ -145,17 +161,14 @@ def CreateNodeFromFbx(nodes_root, fbx_path, name, pos, rot, scale):
 		for param in params.iter('parameter'):
 			if (param.get("name") == "material_guids"):
 				d = param.text.split(",")
-				# print(d)
 				for s in range(0, len(d), 2):
-					surface.append([d[s], d[s + 1]])
-					# surface.append([d[s], "models/Buildings/Small/materials/Bricks_house_01_bricks.mat"])
+					mat_name = GetMatNameFromPath(fbx_path, d[s])
+					surface.append([mat_name, d[s + 1]])
 			pass
 
 		return mesh_data, surface
 
 	mesh_data, surface = GetMeshData(fbx_path)
-	# if (len(mesh_data) == 0 or len(surface) == 0): return
-	# print(str(len(mesh_data)) + " -- " + str(len(surface)))
 
 	for m in range(len(mesh_data)):
 		node = ET.SubElement(nodes_root, 'node')
@@ -193,30 +206,30 @@ def CreateNodeFromDecal(nodes_root, mat, depth, pos, rot, scale):
 
 		mat_path = def_globals.DESTINATION_ASSETS_PATH + "materials/decals/"
 		mat_path += "/".join(mat_rel[:-1])
-		meta = mat_path + "/" + str(mat_rel[-1]) + ".mat.meta"
-		# print("Mat: " + meta)
+		mat_path = mat_path + "/" + str(mat_rel[-1]) + ".mat"
+		meta_path = mat_path + ".meta"
 
-		if (not os.path.exists(meta)):
-			logging.error("\nDecal material not found: " + meta + "\n")
-			return None
+		if (not os.path.exists(mat_path) or not os.path.exists(meta_path)):
+			logging.error("\nDecal material not found: " + mat_path + "\n")
+			return None, None
 
-		tree = ET.parse(meta)
+		tree = ET.parse(meta_path)
 		root = tree.getroot()
-
 		m_uuid = root.find("guid")
-		# print("Uuid: " + str(m_uuid.text))
 
-		return m_uuid.text
+		tree = ET.parse(mat_path)
+		root = tree.getroot()
+		mat_name = xml_get(root, "name")
 
-	name = mat.split("/")[-1]
+		return mat_name, m_uuid.text
 
-	mat_uuid = GetDecalMatUuid(mat)
+
+	mat_name, mat_uuid = GetDecalMatUuid(mat)
 	if (mat_uuid is None): return
-
 
 	node = ET.SubElement(nodes_root, 'node')
 	node.set("type", "DecalOrtho")
-	node.set("name", name)
+	node.set("name", mat_name)
 	node.set("id", str(random_with_N_digits(10)))
 	node.set("material", mat_uuid)
 
@@ -230,9 +243,61 @@ def CreateNodeFromDecal(nodes_root, mat, depth, pos, rot, scale):
 	child = ET.SubElement(node, 'znear')
 	child.text = "0.001"
 
-	# transf = GetTransform(pos, rot, scale)
 	transf = GetTransform(pos, rot, [1, 1, 1])
 	transform = ET.SubElement(node, 'transform')
 	transform.text = transf
 
+	pass
+
+
+def GetNodePathFromPrefabName(path, pref_name):
+	pref_root = os.path.basename(path).replace(".xml", "")
+
+	pref_name = pref_name.split(".")
+	pref_path = def_globals.DESTINATION_ASSETS_PATH + "prefabs/" + pref_root + "/" + os.path.basename(path)[:-4] + "/"
+	pref_path = pref_path + "/".join(pref_name[:-1]) + "/"
+	pref_path = pref_path + pref_name[-1] + ".node"
+	pref_path = pref_path.replace("//", "/")
+
+	return pref_path
+
+
+def AddNodeFromPrefab(nodes_root, guid, pos, rot, scale):
+	prefab_all = ["prefabs/bridges.xml", "prefabs/buildings.xml"]
+
+	for path in prefab_all:
+		pref_path = def_globals.CRYENGINE_ASSETS_PATH + path
+
+		tree = ET.parse(pref_path)
+		root = tree.getroot()
+
+		for pref in root.iter("Prefab"):
+			if (guid != xml_get(pref, "Id")):
+				continue
+
+			prefab_name = xml_get(pref, "Name")
+			pref_path = GetNodePathFromPrefabName(path, prefab_name)
+			pref_meta = pref_path + ".meta"
+
+			if (not os.path.exists(os.path.dirname(pref_meta))):
+				return
+
+			tree = ET.parse(pref_meta)
+			root = tree.getroot()
+			m_uuid = root.find("guid")
+			# if (root.find("type").text == "node"):
+
+			node = ET.SubElement(nodes_root, 'node')
+			node.set("type", "NodeReference")
+			node.set("name", prefab_name.split(".")[-1])
+			node.set("id", str(random_with_N_digits(10)))
+
+			child = ET.SubElement(node, 'reference')
+			child.text = "guid://" + m_uuid.text
+
+			child = ET.SubElement(node, 'transform')
+			transf = GetTransform(pos, rot, scale)
+			child.text = transf
+
+			pass
 	pass
