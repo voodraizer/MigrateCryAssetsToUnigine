@@ -4,6 +4,7 @@ import os
 import logging
 import xml.etree.ElementTree as ET
 
+from unigine.utils import CreateNodeFromBrush, CreateNodeFromDecal
 
 path = os.path.dirname(os.path.abspath(__file__))[:-7]
 sys.path.append(path)
@@ -54,7 +55,8 @@ def CreateTestNode(nodes_root):
 # =============================================================================
 
 def ParseLayerFile(level_path, nodes_root):
-	print("Parse: " + level_path + "\n")
+	# print("\n\nParse: " + level_path + "\n")
+	# logging.info("\nParse: " + level_path + "\n")
 
 	tree = ET.parse(level_path)
 	root = tree.getroot()
@@ -71,7 +73,8 @@ def ParseLayerFile(level_path, nodes_root):
 				rot = ListFromString(rot)
 				scale = ListFromString(scale, [1, 1, 1])
 
-				CreateNodeFromFbx(nodes_root, xml_get(obj, "Prefab"), name, pos, rot, scale)
+				# CreateNodeFromFbx(nodes_root, xml_get(obj, "Prefab"), name, pos, rot, scale)
+				CreateNodeFromBrush(nodes_root, xml_get(obj, "Prefab"), name, pos, rot, scale)
 				pass
 
 			if (xml_get(obj, "Type") == "Prefab"):
@@ -91,6 +94,8 @@ def ParseLayerFile(level_path, nodes_root):
 			if (xml_get(obj, "Type") == "Decal"):
 				name = xml_get(obj, "Name")
 				guid = xml_get(obj, "PrefabGUID")
+				mat = xml_get(obj, "Material")
+				depth = xml_get(obj, "ProjectionDepth")
 				pos = xml_get(obj, "Pos")
 				rot = xml_get(obj, "Rotate")
 				scale = xml_get(obj, "Scale")
@@ -105,6 +110,63 @@ def ParseLayerFile(level_path, nodes_root):
 			if (xml_get(obj, "Type") == "Rope"):
 				pass
 
+
+	pass
+
+
+def ParseDumpFile(level_path, nodes_root):
+	# print("\n\nParse: " + level_path + "\n")
+	# logging.info("\nParse: " + level_path + "\n")
+
+	tree = ET.parse(level_path)
+	root = tree.getroot()
+
+	for node in root.iter('Node'):
+		if (xml_get(node, "Type") == "Brush"):
+			name = xml_get(node, "Name")
+			pos = xml_get(node, "Pos")
+			rot = xml_get(node, "Rot")
+			scale = xml_get(node, "Scale")
+
+			pos = ListFromString(pos)
+			rot = ListFromString(rot)
+			scale = ListFromString(scale, [1, 1, 1])
+
+			name = os.path.basename(name).replace(".cgf", "")
+
+			CreateNodeFromBrush(nodes_root, xml_get(node, "Name"), name, pos, rot, scale)
+			pass
+
+		if (xml_get(node, "Type") == "Vegetation"):
+			name = xml_get(node, "Name")
+			pos = xml_get(node, "Pos")
+			rot = xml_get(node, "Rot")
+			scale = xml_get(node, "Scale")
+
+			pos = ListFromString(pos)
+			rot = ListFromString(rot)
+			scale = ListFromString(scale, [1, 1, 1])
+
+			name = os.path.basename(name).replace(".cgf", "")
+
+			CreateNodeFromBrush(nodes_root, xml_get(node, "Name"), name, pos, rot, scale)
+			pass
+
+		if (xml_get(node, "Type") == "Decal"):
+			name = xml_get(node, "Name")
+			# guid = xml_get(node, "PrefabGUID")
+			mat = xml_get(node, "Material")
+			depth = 1 #xml_get(node, "ProjectionDepth")
+			pos = xml_get(node, "Pos")
+			rot = xml_get(node, "Rotate")
+			scale = xml_get(node, "Scale")
+
+			pos = ListFromString(pos)
+			rot = ListFromString(rot)
+			scale = ListFromString(scale, [1, 1, 1])
+
+			CreateNodeFromDecal(nodes_root, mat, depth, pos, rot, scale)
+			pass
 
 	pass
 
@@ -145,6 +207,33 @@ def ConvertLevel(level_path, level_name):
 	pass
 
 
+def ConvertLevelDump(level_path, level_name):
+	dump_file = level_path + level_name + "_dump.xml"
+	if (not os.path.exists(dump_file)):
+		logging.info("Dump file not found\n" + dump_file + "\n\n")
+		return
+
+	nodes_root = ET.Element('nodes')
+	nodes_root.set("version", "2.11.0.0")
+
+	ParseDumpFile(dump_file, nodes_root)
+
+	node_path = def_globals.DESTINATION_ASSETS_PATH + "level_nodes/" + level_name + ".node"
+	if (not os.path.exists(os.path.dirname(node_path))): os.makedirs(os.path.dirname(node_path))
+	# print(dump_file)
+	# print(node_path)
+
+	indent(nodes_root)
+	tree = ET.ElementTree(nodes_root)
+	tree.write(node_path)
+
+	# print("==================================================")
+	# ET.dump(nodes_root)
+	# print("==============node====================================")
+
+	pass
+
+
 def Convert():
 	logging.basicConfig(filename="D:/LOG_LEVELS.txt", filemode="w", level=logging.INFO)
 	logging.info("==================================== START ====================================\n\n")
@@ -158,10 +247,34 @@ def Convert():
 	              "sample_construction_site_01", "sample_bridge_02", "sample_bridge_01",
 	              "sample_base", "sample_airbase_01"]
 
-	# ConvertLevel(levels_path, "sample_woodcut")
+	# ConvertLevel(levels_path, "sample_bridge_01")
 
 	for level in all_levels:
+		logging.info("\n\n\n========================================== " + level + " ==========================================\n")
 		ConvertLevel(levels_path, level)
+
+	logging.info("\n\n==================================== END ====================================")
+	pass
+
+def Convert_dumps():
+	logging.basicConfig(filename="D:/LOG_LEVELS.txt", filemode="w", level=logging.INFO)
+	logging.info("==================================== START ====================================\n\n")
+
+	levels_path = def_globals.CRYENGINE_ASSETS_PATH + "_DUMPS/"
+
+	all_levels = ["sample_woodcut", "sample_train_station_01", "sample_storage_area",
+	              "sample_rural_farm", "sample_refinery_plant", "sample_plant_07",
+	              "sample_plant_06", "sample_plant_05", "sample_plant_04", "sample_plant_03",
+	              "sample_plant_02", "sample_plant_01", "sample_gas_station", "sample_forest_01",
+	              "sample_construction_site_01", "sample_bridge_02", "sample_bridge_01",
+	              "sample_base", "sample_airbase_01"]
+
+	# ConvertLevel(levels_path, "sample_bridge_01")
+
+	for level in all_levels:
+		logging.info("\n\n\n========================================== " + level + " ==========================================\n")
+
+		ConvertLevelDump(levels_path, level)
 
 	logging.info("\n\n==================================== END ====================================")
 	pass
@@ -171,6 +284,7 @@ def Convert():
 #
 # =============================================================================
 if __name__ == "__main__":
-	Convert()
+	# Convert()
+	Convert_dumps()
 
 	pass

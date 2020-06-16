@@ -120,6 +120,47 @@ def random_with_N_digits(n):
 	return randint(range_start, range_end)
 
 
+def AddNodeReferences(nodes_root, name, path, pos, rot, scale):
+	path_meta = path + ".meta"
+
+	# if (not os.path.exists(os.path.dirname(path_meta))):
+	if (not os.path.exists(path_meta)):
+		logging.info("Node not found\n" + path_meta + "\n\n")
+		return
+
+	tree = ET.parse(path_meta)
+	root = tree.getroot()
+	m_uuid = root.find("guid")
+	# if (root.find("type").text == "node"):
+
+	node = ET.SubElement(nodes_root, 'node')
+	node.set("type", "NodeReference")
+	node.set("name", name)
+	node.set("id", str(random_with_N_digits(10)))
+
+	child = ET.SubElement(node, 'reference')
+	child.text = "guid://" + m_uuid.text
+
+	child = ET.SubElement(node, 'transform')
+	transf = GetTransform(pos, rot, scale)
+	child.text = transf
+	pass
+
+def CreateNodeFromBrush(nodes_root, fbx_path, name, pos, rot, scale):
+
+	node_path = fbx_path.replace(".cgf", ".node")
+	node_path = node_path.replace("Assets/", "")
+	node_path = os.path.join(def_globals.DESTINATION_ASSETS_PATH, node_path)
+
+	if (not os.path.exists(node_path)):
+		logging.error("\nNode not found: " + node_path + "\n")
+		return
+
+	AddNodeReferences(nodes_root, name, node_path, pos, rot, scale)
+	# CreateNodeFromFbx(nodes_root, fbx_path, name, pos, rot, scale)
+	pass
+
+
 def CreateNodeFromFbx(nodes_root, fbx_path, name, pos, rot, scale):
 
 	def GetMatNameFromPath(fbx_path, mat_name):
@@ -277,27 +318,8 @@ def AddNodeFromPrefab(nodes_root, guid, pos, rot, scale):
 
 			prefab_name = xml_get(pref, "Name")
 			pref_path = GetNodePathFromPrefabName(path, prefab_name)
-			pref_meta = pref_path + ".meta"
 
-			if (not os.path.exists(os.path.dirname(pref_meta))):
-				return
-
-			tree = ET.parse(pref_meta)
-			root = tree.getroot()
-			m_uuid = root.find("guid")
-			# if (root.find("type").text == "node"):
-
-			node = ET.SubElement(nodes_root, 'node')
-			node.set("type", "NodeReference")
-			node.set("name", prefab_name.split(".")[-1])
-			node.set("id", str(random_with_N_digits(10)))
-
-			child = ET.SubElement(node, 'reference')
-			child.text = "guid://" + m_uuid.text
-
-			child = ET.SubElement(node, 'transform')
-			transf = GetTransform(pos, rot, scale)
-			child.text = transf
+			AddNodeReferences(nodes_root, prefab_name.split(".")[-1], pref_path, pos, rot, scale)
 
 			pass
 	pass
